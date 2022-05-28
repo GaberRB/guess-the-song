@@ -20,3 +20,11 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant-path-matcher
+
+deezer:
+  url: ${url}
+  header-host: ${header-host}
+  header-key: ${header-key}
+  host: ${host}
+  key: ${key}
+
