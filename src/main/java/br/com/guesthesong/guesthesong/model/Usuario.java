@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import javax.persistence.*;
+import java.util.Arrays;
 
 @Data
 @AllArgsConstructor
@@ -15,12 +17,13 @@ import javax.persistence.*;
 @Table(name = "tb_usuario")
 public class Usuario {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "nickName", length = 50, nullable = false, unique = true)
-    private String nickName;
+    @Column(name = "name", length = 50, nullable = false, unique = true)
+    private String name;
 
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
@@ -28,5 +31,19 @@ public class Usuario {
     @Column(name = "password", length = 12, nullable = false)
     private String password;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
 }
