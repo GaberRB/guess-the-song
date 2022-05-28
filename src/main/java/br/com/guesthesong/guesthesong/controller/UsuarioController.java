@@ -2,6 +2,7 @@ package br.com.guesthesong.guesthesong.controller;
 
 import br.com.guesthesong.guesthesong.model.Usuario;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.List;
 
 
 @RestController
+@Slf4j
 @RequestMapping("/api/usuario/v1")
 public class UsuarioController {
 
@@ -26,7 +28,9 @@ public class UsuarioController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Salvar Usuário na base")
     public Usuario salvar(Usuario usuario){
+        log.info("Retorno do usuário: {}", usuario);
         return usuarioService.salvar(usuario);
+
     }
 
     @GetMapping

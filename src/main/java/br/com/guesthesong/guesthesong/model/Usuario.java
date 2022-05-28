@@ -18,37 +18,15 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(name = "usuario", length = 50, nullable = false)
-    private String usuario;
+
+    @Column(name = "nickName", length = 50, nullable = false, unique = true)
+    private String nickName;
 
     @Column(name = "email", length = 50, nullable = false, unique = true)
     private String email;
 
-    @Column(name = "senha", length = 12, nullable = false, unique = true)
-    private String senha;
+    @Column(name = "password", length = 12, nullable = false)
+    private String password;
 
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
 }
