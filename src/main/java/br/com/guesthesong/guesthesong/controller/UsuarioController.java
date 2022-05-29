@@ -1,20 +1,22 @@
 package br.com.guesthesong.guesthesong.controller;
 
 import br.com.guesthesong.guesthesong.model.Usuario;
-import io.swagger.annotations.ApiOperation;
+import br.com.guesthesong.guesthesong.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import br.com.guesthesong.guesthesong.service.UsuarioService;
 
 import java.util.List;
 
 
 @RestController
 @Slf4j
+@Tag(name = "Cadastro de um usuario no banco de dados")
 @RequestMapping("/api/usuario/v1")
 public class UsuarioController {
 
@@ -26,7 +28,7 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiOperation(value = "Salvar Usuário na base")
+    @Operation(summary = "Salvar Usuário na base")
     public Usuario salvar(Usuario usuario){
         log.info("Retorno do usuário: {}", usuario);
         return usuarioService.salvar(usuario);
@@ -35,14 +37,14 @@ public class UsuarioController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Listar todos os usuários")
+    @Operation(summary = "Listar todos os usuários")
     public List<Usuario> lista(){
         return usuarioService.lista();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Buscar usuário por ID")
+    @Operation(summary = "Buscar usuário por ID")
     public Usuario buscarPorId(@PathVariable("id") Long id){
         return usuarioService.buscarPorId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
@@ -50,7 +52,7 @@ public class UsuarioController {
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "Remover usuario por ID")
+    @Operation(summary = "Remover usuario por ID")
     public void remover(@PathVariable("id") Long id){
         usuarioService.buscarPorId(id)
                 .map(jogador -> {
@@ -61,7 +63,7 @@ public class UsuarioController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiOperation(value = "Atualizar usuário na base")
+    @Operation(summary = "Atualizar usuário na base")
     public void atualiza(@PathVariable("id") Long id, @RequestBody Usuario usuario){
         usuarioService.buscarPorId(id)
                 .map(usuarioFind -> {
