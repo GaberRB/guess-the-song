@@ -1,5 +1,6 @@
 package br.com.guesthesong.guesthesong.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import java.util.List;
 @Component
 public class DataQuizMusic {
 
+    @JsonProperty("results")
     private List<QuizMusic> quizMusic;
 
 }

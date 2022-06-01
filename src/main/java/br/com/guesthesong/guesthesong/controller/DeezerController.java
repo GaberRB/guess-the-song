@@ -10,9 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Api do Dezzer, aqui buscamos uma musica/cantor")
+@CrossOrigin
+@Tag(name = "Dezzer api, here we are looking for a song/singer")
 @RestController
-@RequestMapping("/api/deezer/v1")
+@RequestMapping("/api/quiz/v1")
 public class DeezerController {
 
     @Autowired
@@ -24,11 +25,11 @@ public class DeezerController {
     @Autowired
     private DeezerService deezerService;
 
-    @GetMapping("/{cantorOuMusica}")
+    @GetMapping("/{songOrsinger}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Realizar a busca no deezer")
-    public DataQuizMusic deezerBuscar(@PathVariable("cantorOuMusica") String cantorOuMusica) {
-        return deezerService.findMusicOnDeezerApi(cantorOuMusica);
+    @Operation(summary = "Search on deezer")
+    public DataQuizMusic deezerFindBySong(@PathVariable("songOrsinger") String songOrsinger) {
+        return deezerService.findMusicOnDeezerApi(songOrsinger);
     }
 
 }

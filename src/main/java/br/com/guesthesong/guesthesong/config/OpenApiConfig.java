@@ -15,7 +15,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Guess The Song DOCs")
                         .version("v1")
-                        .description("Documentação da API, é utilizado a API do deezer para retornar musicas e será exibido ao jogador e o mesmo deverá advinhar qual a música antes do termino do tempo")
+                        .description("API documentation, the deezer API is used to return songs and it will be displayed to the player and the player must guess which song before the end of time")
                         .termsOfService("http://swagger.io/terms/")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }
