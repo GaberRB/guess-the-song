@@ -25,8 +25,10 @@ public class DeezerService {
         List<String> incorrectAnswers = Arrays.asList("Wrong Music", "Wrong Music", "Wrong Music");
         List<QuizMusic> quizMusics = new ArrayList<QuizMusic>();
         var response = deezerClient.search(singerOrMusic);
+        var i = 0;
         for (var deezerMusic:response.getDeezerResponses()) {
             quizMusic = QuizMusic.builder()
+                    .question(String.valueOf(i++) + " - Guess the song?")
                     .correctAnswer(deezerMusic.getTitulo())
                     .incorrectAnswers(incorrectAnswers)
                     .mp3Link(deezerMusic.getLinkPlayer())

@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
-@Tag(name = "Qualquer classes com Any é pra vcs copiar e usar como referencia")
+@Tag(name = "Any classes with Any is for you to copy and use as a reference")
 @RestController
 @RequestMapping("/api/any/v1")
 public class AnyController {
@@ -25,30 +25,30 @@ public class AnyController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Salvar no banco de dados")
-    public Any salvar(Any any){
+    @Operation(summary = "Save in database")
+    public Any save(Any any){
         return anyService.salvar(any);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Consulta de todos no banco de dados")
-    public List<Any> lista(){
+    @Operation(summary = "Find all in database")
+    public List<Any> findAll(){
         return anyService.lista();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Consulta por ID no banco de dados")
-    public Any buscarPorId(@PathVariable("id") Long id){
+    @Operation(summary = "find by id in database")
+    public Any findById(@PathVariable("id") Long id){
         return anyService.buscarPorId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Any não encontrado"));
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Remover por ID no banco de dados")
-    public void remover(@PathVariable("id") Long id){
+    @Operation(summary = "delete by id in database")
+    public void delete(@PathVariable("id") Long id){
         anyService.buscarPorId(id)
                 .map(any -> {
                     anyService.remover(id);
@@ -58,8 +58,8 @@ public class AnyController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Atualizar por ID no banco de dados")
-    public void atualiza(@PathVariable("id") Long id, @RequestBody Any any){
+    @Operation(summary = "Update by id in database")
+    public void update(@PathVariable("id") Long id, @RequestBody Any any){
         anyService.buscarPorId(id)
                 .map(anyFind -> {
                     modelMapper.map(any, anyFind);

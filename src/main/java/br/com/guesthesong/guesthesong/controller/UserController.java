@@ -16,9 +16,9 @@ import java.util.List;
 
 @RestController
 @Slf4j
-@Tag(name = "Cadastro de um usuario no banco de dados")
-@RequestMapping("/api/usuario/v1")
-public class UsuarioController {
+@Tag(name = "User registration in the database")
+@RequestMapping("/api/user/v1")
+public class UserController {
 
     @Autowired
     private UsuarioService usuarioService;
@@ -28,16 +28,15 @@ public class UsuarioController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Salvar Usuário na base")
-    public Usuario salvar(Usuario usuario){
-        log.info("Retorno do usuário: {}", usuario);
+    @Operation(summary = "Save user in database")
+    public Usuario save(Usuario usuario){
         return usuarioService.salvar(usuario);
 
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Listar todos os usuários")
+    @Operation(summary = "FindAll user in database")
     public List<Usuario> lista(){
         return usuarioService.lista();
     }
