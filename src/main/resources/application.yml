@@ -17,11 +17,6 @@ spring:
       path: /h2
       settings.web-allow-others: true
 
-
-  mvc:
-    pathmatch:
-      matching-strategy: ant-path-matcher
-
 deezer:
   url: ${url}
   header-host: ${header-host}
