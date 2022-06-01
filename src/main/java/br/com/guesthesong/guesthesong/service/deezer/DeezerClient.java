@@ -11,7 +11,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Slf4j
 @Service
@@ -20,18 +22,37 @@ public class DeezerClient {
     @Autowired
     private DeezerConfig deezerConfig;
 
-    public DeezerResponse search(String cantorOuMusica) throws IOException {
+    @Autowired
+    private DeezerDataResponse deezerDataResponse;
+
+    public DeezerDataResponse search(String cantorOuMusica) {
         var url = deezerConfig.getUrl() + "search?q="+ cantorOuMusica.replace(" ", "+");
+        List<DeezerResponse> deezerResponseList = new ArrayList<DeezerResponse>();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add(deezerConfig.getHeaderHost(), deezerConfig.getHost());
         headers.add(deezerConfig.getHeaderKey(), deezerConfig.getKey());
         HttpEntity<String> entity = new HttpEntity<>("body", headers);
 
-        var response = restTemplate.exchange(url, HttpMethod.GET, entity, DeezerDataResponse.class);
-        log.info("Deezer response: {}", String.valueOf(response) );
+        var response = restTemplate.exchange(url, HttpMethod.GET, entity, DeezerDataResponse.class).getBody().getDeezerResponses();
+        for (int i = 0; i < 10; i++) {
+            try {
+                var deezerResponse = DeezerResponse.builder()
+                        .artista(response.get(i).getArtista())
+                        .titulo(response.get(i).getTitulo())
+                        .linkPlayer(response.get(i).getLinkPlayer())
+                        .build();
+                deezerResponseList.add(deezerResponse);
+            }catch (Exception e){
+                log.info("Warning not exists 10 musics");
+            }
 
-        return response.getBody().getDeezerResponses().get(0);
+        }
+        deezerDataResponse.setDeezerResponses(deezerResponseList);
+
+        log.info("Deezer response: {}", String.valueOf(deezerDataResponse));
+
+        return deezerDataResponse;
     }
 
 

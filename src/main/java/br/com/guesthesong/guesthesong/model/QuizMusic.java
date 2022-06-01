@@ -1,4 +1,4 @@
-package br.com.guesthesong.guesthesong.service.deezer.Response;
+package br.com.guesthesong.guesthesong.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -14,8 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Component
-public class DeezerDataResponse {
+public class QuizMusic {
 
-    @JsonProperty("data")
-    private List<DeezerResponse> deezerResponses;
+    @JsonProperty("correct_answer")
+    private String correctAnswer;
+    @JsonProperty("incorrect_answers")
+    private List<String> incorrectAnswers;
+    @JsonProperty("mp3_link")
+    private String mp3Link;
+
+
 }
