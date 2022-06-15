@@ -22,6 +22,7 @@ spring:
 
 deezer:
   url: ${url}
+  url-playlist: ${url-playlist}
   header-host: ${header-host}
   header-key: ${header-key}
   host: ${host}

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class DeezerConfig {
 
     private String url;
+    private String urlPlaylist;
     private String headerHost;
     private String headerKey;
     private String host;

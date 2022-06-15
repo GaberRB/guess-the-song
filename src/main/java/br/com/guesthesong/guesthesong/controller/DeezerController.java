@@ -25,11 +25,18 @@ public class DeezerController {
     @Autowired
     private DeezerService deezerService;
 
-    @GetMapping("/{songOrsinger}")
+//    @GetMapping("/{songOrsinger}")
+//    @ResponseStatus(HttpStatus.OK)
+//    @Operation(summary = "Search on deezer")
+//    public DataQuizMusic deezerFindBySong(@PathVariable("songOrsinger") String songOrsinger) {
+//        return deezerService.findMusicOnDeezerApi(songOrsinger);
+//    }
+
+    @GetMapping("/{playlist}")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Search on deezer")
-    public DataQuizMusic deezerFindBySong(@PathVariable("songOrsinger") String songOrsinger) {
-        return deezerService.findMusicOnDeezerApi(songOrsinger);
+    @Operation(summary = "Playlist on deezer")
+    public DataQuizMusic deezerFindByplaylist(@PathVariable("playlist") String songOrsinger) {
+        return deezerService.findPlaylistOnDeezerApi(songOrsinger);
     }
 
 }
