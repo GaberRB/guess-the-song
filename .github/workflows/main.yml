@@ -2,7 +2,7 @@ name: Verificação de Branches
 
 on:
   schedule:
-    - cron: "0 0/1 * 1/1 * ? *"
+    - cron: "* * * * *"
   push:
     branches:
       - main
@@ -50,5 +50,3 @@ jobs:
             assignees: [assignees]
           });
           console.log('Issue created:', data.html_url);
-
-
