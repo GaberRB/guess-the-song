@@ -1,15 +1,15 @@
 ---
-title: Sincronizar Branches
+title: Último Commit
 assignees: ${{ github.event.head_commit.author.username }}
-labels: alerta, melhoria
+labels: notificação, enhancement
 ---
 
-Por favor, sincronize suas alterações entre as branches `master` e `develop`.
+Este é um aviso para informar que um novo commit foi adicionado ao repositório.
 
-**Branches:**
-- Último commit na branch `master`: [hash-do-commit-feat-englishVersion]
-- Último commit na branch `feat-englishVersion`: [hash-do-commit-master]
+**Informações do commit:**
+- Autor: ${{ github.event.head_commit.author.name }}
+- Mensagem: ${{ github.event.head_commit.message }}
 
-A branch `develop` está à frente da branch `master` por [número-de-commits] commits. Por favor, revise e incorpore quaisquer alterações necessárias para garantir que ambas as branches estejam sincronizadas.
+Por favor, verifique o novo commit e tome as medidas necessárias, se aplicável.
 
-Agradecemos sua atenção!
+Obrigado!
