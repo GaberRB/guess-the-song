@@ -31,3 +31,12 @@ jobs:
           echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
           echo "::set-output name=issue-body::A branch develop está $date_diff dias à frente da branch master. Por favor, sincronize suas alterações."
         fi
+        
+    - name: Criar issue
+      id: create-issue
+      uses: peter-evans/create-issue@v2
+      with:
+        title: ${{ steps.branch-comparison.outputs.issue-title }}
+        body: ${{ steps.branch-comparison.outputs.issue-body }}
+        assignees: ${{ github.event.head_commit.author.username }}
+
