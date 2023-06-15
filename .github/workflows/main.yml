@@ -5,8 +5,8 @@ on:
     - cron: "0 0 * * *"
   push:
     branches:
-      - master
-      - develop
+      - main
+      - feat-englishVersion
 
 jobs:
   branch-comparison:
@@ -25,11 +25,11 @@ jobs:
         master_date=$(git log -1 --format="%ct")
         date_diff=$(( (master_date - develop_date) / 86400 ))
         if [[ $date_diff -gt 7 ]]; then
-          echo "A branch develop está $date_diff dias à frente da branch master. Por favor, sincronize suas alterações."
+          echo "A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
 
           # Criar uma issue
           echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
-          echo "::set-output name=issue-body::A branch develop está $date_diff dias à frente da branch master. Por favor, sincronize suas alterações."
+          echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
         fi
         
     - name: Criar issue
@@ -39,4 +39,3 @@ jobs:
         title: ${{ steps.branch-comparison.outputs.issue-title }}
         body: ${{ steps.branch-comparison.outputs.issue-body }}
         assignees: ${{ github.event.head_commit.author.username }}
-
