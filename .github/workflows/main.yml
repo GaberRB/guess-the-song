@@ -26,5 +26,8 @@ jobs:
         date_diff=$(( (master_date - develop_date) / 86400 ))
         if [[ $date_diff -gt 7 ]]; then
           echo "A branch develop está $date_diff dias à frente da branch master. Por favor, sincronize suas alterações."
-          # Você pode adicionar ações adicionais aqui, como enviar notificações aos usuários
+
+          # Criar uma issue
+          echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
+          echo "::set-output name=issue-body::A branch develop está $date_diff dias à frente da branch master. Por favor, sincronize suas alterações."
         fi
