@@ -49,10 +49,11 @@ jobs:
             assignees: [assignees]
           };
 
-          const { data } = await octokit.rest.issues.create(createIssueParams);
+          const { data } = await octokit.issues.create(createIssueParams);
           console.log('Issue created:', data.html_url);
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
