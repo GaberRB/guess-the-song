@@ -33,22 +33,26 @@ jobs:
         fi
 
     - name: Criar issue
-      uses: actions/github-script@v4
+      uses: actions/github-script@v5
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
-          const issueTitle = `${{ steps.branch-comparison.outputs.issue-title }}`.trim();
-          const issueBody = `${{ steps.branch-comparison.outputs.issue-body }}`.trim();
-          const assignees = `${{ github.event.head_commit.author.username }}`;
+          const github = context.github;
+          const issueTitle = "${{ steps.branch-comparison.outputs.issue-title }}";
+          const issueBody = "${{ steps.branch-comparison.outputs.issue-body }}";
+          const assignees = "${{ github.event.head_commit.author.username }}";
 
-          const issue = await github.issues.create({
+          const createIssueParams = {
             owner: context.repo.owner,
             repo: context.repo.repo,
             title: issueTitle,
             body: issueBody,
             assignees: [assignees]
-          });
+          };
 
-          console.log('Issue created:', issue.data.html_url);
+          const { data } = await github.issues.create(createIssueParams);
+          console.log('Issue created:', data.html_url);
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
