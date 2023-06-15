@@ -1,6 +1,15 @@
 ---
-title: Someone just pushed
-assignees: JasonEtco, matchai
-labels: bug, enhancement
+title: Sincronizar Branches
+assignees: ${{ github.event.head_commit.author.username }}
+labels: alerta, melhoria
 ---
-Someone just pushed, oh no! Here's who did it: {{ payload.sender.login }}.
+
+Por favor, sincronize suas alterações entre as branches `master` e `develop`.
+
+**Branches:**
+- Último commit na branch `master`: [hash-do-commit]
+- Último commit na branch `feat-englishVersion`: [hash-do-commit]
+
+A branch `develop` está à frente da branch `master` por [número-de-commits] commits. Por favor, revise e incorpore quaisquer alterações necessárias para garantir que ambas as branches estejam sincronizadas.
+
+Agradecemos sua atenção!
