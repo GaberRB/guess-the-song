@@ -36,7 +36,7 @@ jobs:
       uses: actions/github-script@v5
       with:
         script: |
-          const { Octokit } = require("@octokit/core");
+          const { Octokit } = require("@octokit/rest");
           const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
           const issueTitle = "${{ steps.branch-comparison.outputs.issue-title }}";
           const issueBody = "${{ steps.branch-comparison.outputs.issue-body }}";
@@ -50,10 +50,11 @@ jobs:
             assignees: [assignees]
           };
 
-          const { data } = await octokit.request('POST /repos/{owner}/{repo}/issues', createIssueParams);
+          const { data } = await octokit.issues.create(createIssueParams);
           console.log('Issue created:', data.html_url);
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
 
