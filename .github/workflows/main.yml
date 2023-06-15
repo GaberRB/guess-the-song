@@ -31,11 +31,22 @@ jobs:
           echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
           echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
         fi
-        
+
     - name: Criar issue
-      id: create-issue
-      uses: peter-evans/create-issue@v2
+      uses: actions/github-script@v4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        title: ${{ steps.branch-comparison.outputs.issue-title }}
-        body: ${{ steps.branch-comparison.outputs.issue-body }}
-        assignees: ${{ github.event.head_commit.author.username }}
+        script: |
+          const issueTitle = '${{ steps.branch-comparison.outputs.issue-title }}';
+          const issueBody = '${{ steps.branch-comparison.outputs.issue-body }}';
+          const assignees = '${{ github.event.head_commit.author.username }}';
+          
+          const { data } = await github.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: issueTitle,
+            body: issueBody,
+            assignees: [assignees]
+          });
+          console.log('Issue created:', data.html_url);
