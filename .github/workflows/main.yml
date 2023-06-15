@@ -32,32 +32,13 @@ jobs:
           echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
         fi
 
-    - name: Criar issue
-      run: |
-        TOKEN="${{ secrets.GITHUB_TOKEN }}"
-        REPO_OWNER="${{ github.repository_owner }}"
-        REPO_NAME="${{ github.repository }}"
-        ISSUE_TITLE="${{ steps.branch-comparison.outputs.issue-title }}"
-        ISSUE_BODY="${{ steps.branch-comparison.outputs.issue-body }}"
-        ASSIGNEE="${{ github.event.head_commit.author.username }}"
-
-        response=$(curl -X POST \
-          -H "Authorization: Bearer $TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          -d '{
-            "title": "'"$ISSUE_TITLE"'",
-            "body": "'"$ISSUE_BODY"'",
-            "assignees": ["'"$ASSIGNEE"'"]
-          }' \
-          "https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/issues")
-
-        issue_url=$(echo "$response" | jq -r '.html_url')
-
-        if [[ $issue_url == "null" ]]; then
-          echo "Falha ao criar a issue."
-        else
-          echo "Issue criada: $issue_url"
-        fi
+    - name: Create an issue
+      uses: JasonEtco/create-an-issue@v2.9.1
+      with:
+        title: ${{ steps.branch-comparison.outputs.issue-title }}
+        body: ${{ steps.branch-comparison.outputs.issue-body }}
+        assignees: ${{ github.event.head_commit.author.username }}
+        labels: "auto-generated"
 
 
 
