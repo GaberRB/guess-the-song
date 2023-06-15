@@ -20,15 +20,6 @@ jobs:
       run: |
         git fetch --all --prune
         git checkout feat-englishVersion
-        develop_commit=$(git rev-parse HEAD)
-        git checkout master
-        master_commit=$(git rev-parse HEAD)
-
-        sed -i "s/\[hash-do-commit-develop\]/$develop_commit/g" .github/ISSUE_TEMPLATE.md
-        sed -i "s/\[hash-do-commit-master\]/$master_commit/g" .github/ISSUE_TEMPLATE.md
-
-        git fetch --all --prune
-        git checkout feat-englishVersion
         develop_date=$(git log -1 --format="%ct")
         git checkout master
         master_date=$(git log -1 --format="%ct")
