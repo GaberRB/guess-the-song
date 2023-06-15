@@ -5,7 +5,7 @@ on:
     - cron: "* * * * *"
   push:
     branches:
-      - main
+      - master
       - feat-englishVersion
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
         git fetch --all --prune
         git checkout feat-englishVersion
         develop_date=$(git log -1 --format="%ct")
-        git checkout main
+        git checkout master
         master_date=$(git log -1 --format="%ct")
         date_diff=$(( (master_date - develop_date) / 86400 ))
         if [[ $date_diff -gt 7 ]]; then
