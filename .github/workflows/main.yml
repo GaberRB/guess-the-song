@@ -25,6 +25,7 @@ jobs:
       - name: Obter informações do último commit da branch feat-englishVersion
         id: commit-info
         run: |
+          git branch
           git checkout feat-englishVersion
           commit_author=$(git log -1 --format="%an")
           commit_id=$(git log -1 --format="%H")
