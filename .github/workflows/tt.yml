@@ -1,0 +1,25 @@
+name: Listar Issues de Todos os Repositórios
+
+on:
+  workflow_dispatch:
+
+jobs:
+  list-issues:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v2
+
+      - name: Instalar dependências
+        run: npm install @actions/github
+
+      - name: Listar issues
+        id: list-issues
+        uses: ./.github/actions/list-issues
+        with:
+          organization: nome-da-organizacao
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Imprimir issues
+        run: echo "${{ steps.list-issues.outputs.issues }}"
