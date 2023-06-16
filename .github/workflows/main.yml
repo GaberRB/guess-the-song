@@ -66,8 +66,16 @@ jobs:
               - Data do commit: ${{ steps.commit-info.outputs.commit-date }}
             `;
             const assignees = ['${{ steps.commit-info.outputs.commit-author }}'];
-            
-            const labels = ['Alerta', 'Mergear']; // Adicione os nomes dos labels que você deseja usar
+            const labels = [
+                {
+                  name: 'Alerta',
+                  color: 'FF0000' // Cor vermelha em hexadecimal
+                },
+                {
+                  name: 'Mergear',
+                  color: '00FF00' // Cor verde em hexadecimal
+                }
+              ];
             
             const { data } = await github.issues.create({
               owner: context.repo.owner,
