@@ -15,7 +15,8 @@ jobs:
           REPOSITORIES="GaberRB/guess-the-song GaberRB/tengu"
 
           for REPO in $REPOSITORIES; do
-            ISSUES=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/issues?state=all" | jq -r ".[].title")
+            RESPONSE=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/issues?state=all")
+            ISSUES=$(echo "$RESPONSE" | jq -r ".[].title")
             echo "Repositório: $REPO"
             echo "Issues:"
             while IFS= read -r ISSUE; do
