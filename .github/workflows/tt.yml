@@ -19,7 +19,7 @@ jobs:
 
           for REPO in $REPOSITORIES; do
             RESPONSE=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/issues?state=all")
-            ISSUES=$(echo "$RESPONSE" | jq -r ".[].title")
+            ISSUES=$(echo "$RESPONSE" | jq -r ".[] | .title")
             echo "Repositório: $REPO"
             echo "Issues:"
             while IFS= read -r ISSUE; do
