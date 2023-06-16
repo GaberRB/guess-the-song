@@ -35,19 +35,22 @@ jobs:
     - name: Obter informações do último commit
       id: commit-info
       run: |
-        last_commit=$(git log -1 --pretty=format:"%h - %an: %s")
-        echo "::set-output name=commit-details::${last_commit}"
+        last_commit_author=$(git log -1 --pretty=format:"%an")
+        last_commit_message=$(git log -1 --pretty=format:"%s")
+        echo "::set-output name=commit-author::${last_commit_author}"
+        echo "::set-output name=commit-message::${last_commit_message}"
 
     - name: Criar issue
       uses: JasonEtco/create-an-issue@v2
+      with:
+        filename: .github/ISSUE_TEMPLATE.md
+        assignees: ${{ steps.commit-info.outputs.commit-author }}
+        labels: notificação, enhancement
+        update_existing: true
+        search_existing: true
+
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        title: Último Commit
-        body: |
-          Informações do commit:
-
-          Autor: ${{ steps.commit-info.outputs.commit-details }}
 
 
 
