@@ -39,6 +39,21 @@ jobs:
         last_commit_message=$(git log -1 --pretty=format:"%s")
         echo "::set-output name=commit-author::${last_commit_author}"
         echo "::set-output name=commit-message::${last_commit_message}"
+        
+        - name: Verificar usuário existente
+         id: check-user
+        run: |
+          if [[ -n "${{ steps.commit-info.outputs.commit-author }}" ]]; then
+            username="${{ steps.commit-info.outputs.commit-author }}"
+            exists=$(curl -s -o /dev/null -w "%{http_code}" https://api.github.com/users/$username)
+            if [[ $exists == "200" ]]; then
+              echo "::set-output name=assignees::$username"
+            else
+              echo "::set-output name=assignees::"
+            fi
+          else
+            echo "::set-output name=assignees::"
+          fi
 
     - name: Criar issue
       uses: JasonEtco/create-an-issue@v2
