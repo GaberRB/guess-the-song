@@ -3,10 +3,7 @@ name: Verificação de Branches
 on:
   schedule:
     - cron: "* * * * *"
-  push:
-    branches:
-      - master
-      - feat-englishVersion
+
 
 jobs:
   branch-comparison:
