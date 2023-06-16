@@ -42,15 +42,28 @@ jobs:
 
       - name: Criar issue se a diferença for maior que 30 dias
         if: ${{ steps.branch-comparison.outputs.date-diff > 30 }}
-        uses: peter-evans/create-issue@v3
+        uses: actions/github-script@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          title: Aviso de Sincronização de Branches
-          body: |
-            A branch feat-englishVersion está ${{ steps.branch-comparison.outputs.date-diff }} dias à frente da branch main. Por favor, sincronize suas alterações.
+          script: |
+            const title = 'Aviso de Sincronização de Branches';
+            const body = `
+              A branch feat-englishVersion está ${{ steps.branch-comparison.outputs.date-diff }} dias à frente da branch main. Por favor, sincronize suas alterações.
 
-            **Informações do commit:**
-            - Autor: ${{ steps.commit-info.outputs.commit-author }}
-            - ID do commit: ${{ steps.commit-info.outputs.commit-id }}
-            - Mensagem do commit: ${{ steps.commit-info.outputs.commit-message }}
-            - Data do commit: ${{ steps.commit-info.outputs.commit-date }}
-          labels: notificação, enhancement
+              **Informações do commit:**
+              - Autor: ${{ steps.commit-info.outputs.commit-author }}
+              - ID do commit: ${{ steps.commit-info.outputs.commit-id }}
+              - Mensagem do commit: ${{ steps.commit-info.outputs.commit-message }}
+              - Data do commit: ${{ steps.commit-info.outputs.commit-date }}
+            `;
+            const assignees = ['${{ steps.commit-info.outputs.commit-author }}'];
+            
+            const { data } = await github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              assignees
+            });
+            console.log(`Issue criada com sucesso: ${data.html_url}`);
