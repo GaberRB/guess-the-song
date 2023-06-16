@@ -13,62 +13,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do repositório
-        uses: actions/checkout@v2
+    - name: Checkout do repositório
+      uses: actions/checkout@v2
 
-      - name: Comparar datas das branches
-        run: |
-          git fetch --all --prune
-          git checkout feat-englishVersion
-          develop_date=$(git log -1 --format="%ct")
-          git checkout master
-          master_date=$(git log -1 --format="%ct")
-          date_diff=$(( (master_date - develop_date) / 86400 ))
-          if [[ $date_diff -gt 7 ]]; then
-            echo "A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
+    - name: Comparar datas das branches
+      run: |
+        git fetch --all --prune
+        git checkout feat-englishVersion
+        develop_date=$(git log -1 --format="%ct")
+        git checkout master
+        master_date=$(git log -1 --format="%ct")
+        date_diff=$(( (master_date - develop_date) / 86400 ))
+        if [[ $date_diff -gt 30 ]]; then
+          echo "A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
 
-            # Criar uma issue
-            echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
-            echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
-          fi
-
-      - name: Obter informações do último commit
-        id: commit-info
-        run: |
-          last_commit_author=$(git log -1 --pretty=format:"%an")
-          last_commit_message=$(git log -1 --pretty=format:"%s")
-          echo "::set-output name=commit-author::${last_commit_author}"
-          echo "::set-output name=commit-message::${last_commit_message}"
+          # Criar uma issue
+          echo "::set-output name=create-issue::true"
+          echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
+          echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
+          echo "::set-output name=author::$(git log -1 --format="%an")"
+          echo "::set-output name=commit-id::$(git log -1 --format="%H")"
+          echo "::set-output name=commit-message::$(git log -1 --format="%s")"
+          echo "::set-output name=commit-date::$(git log -1 --format="%cd")"
+          echo "::set-output name=assignees::$(git log -1 --format="%an")"
+        else
+          echo "::set-output name=create-issue::false"
           
-      - name: Obter nome de usuário do GitHub
-        id: get-github-username
-        run: |
-          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/user")
-          username=$(echo "$response" | jq -r .login)
-          echo "::set-output name=username::$username"
+    - name: Create Issue on Failed workflow
+      if: ${{ steps.branch-comparison.outputs.create-issue == 'true' }}
+      uses: dacbd/create-issue-action@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        title: ${{ steps.branch-comparison.outputs.issue-title }}
+        body: |
+          ${{ steps.branch-comparison.outputs.issue-body }}
 
-      - name: Verificar usuário existente
-        id: check-user
-        run: |
-          username="${{ steps.get-github-username.outputs.username }}"
-          if [[ -n $username ]]; then
-            exists=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/users/$username")
-            if [[ $exists == "200" ]]; then
-              echo "::set-output name=assignees::$username"
-            else
-              echo "::set-output name=assignees::"
-            fi
-          else
-            echo "::set-output name=assignees::"
-          fi
-
-      - name: Criar issue
-        uses: JasonEtco/create-an-issue@v2
-        with:
-          filename: .github/ISSUE_TEMPLATE.md
-          assignees: ${{ steps.check-user.outputs.assignees }}
-          labels: notificação, enhancement
-          update_existing: true
-          search_existing: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          **Informações do commit:**
+          - Autor: ${{ steps.branch-comparison.outputs.author }}
+          - ID do commit: ${{ steps.branch-comparison.outputs.commit-id }}
+          - Mensagem do commit: ${{ steps.branch-comparison.outputs.commit-message }}
+          - Data do commit: ${{ steps.branch-comparison.outputs.commit-date }}
+        assignees: ${{ steps.branch-comparison.outputs.assignees }}
