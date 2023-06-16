@@ -2,8 +2,7 @@ name: Verificação de Branches
 
 on:
   schedule:
-    - cron: "* * * * *"
-
+    - cron: "*/5 * * * *"
 
 jobs:
   branch-comparison:
