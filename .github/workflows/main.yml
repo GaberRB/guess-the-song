@@ -67,11 +67,14 @@ jobs:
             `;
             const assignees = ['${{ steps.commit-info.outputs.commit-author }}'];
             
+            const labels = ['Alerta', 'Mergear']; // Adicione os nomes dos labels que você deseja usar
+            
             const { data } = await github.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title,
               body,
-              assignees
+              assignees,
+              labels: labels
             });
             console.log(`Issue criada com sucesso: ${data.html_url}`);
