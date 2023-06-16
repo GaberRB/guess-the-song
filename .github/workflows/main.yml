@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Listar branches
-        run: git branch -a
+        run: git fetch --all --prune
 
       - name: Checkout do repositório
         uses: actions/checkout@v2
