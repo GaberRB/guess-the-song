@@ -27,7 +27,8 @@ jobs:
           echo "::set-output name=commit-author::$commit_author"
           echo "::set-output name=commit-id::$commit_id"
           echo "::set-output name=commit-message::$commit_message"
-          echo "::set-output name=commit-date::$commit_date"
+          echo "::set-output name=commit-date::$commit_date
+
 
       - name: Comparar datas das branches
         id: branch-comparison
