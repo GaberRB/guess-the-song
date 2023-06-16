@@ -1,0 +1,58 @@
+name: Verificação de Branches
+
+on:
+  schedule:
+    - cron: "* * * * *"
+  push:
+    branches:
+      - master
+      - feat-englishVersion
+
+jobs:
+  branch-comparison:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do repositório
+      uses: actions/checkout@v3
+
+    - name: Comparar datas das branches
+      run: |
+        git fetch --all --prune
+        git checkout feat-englishVersion
+        develop_date=$(git log -1 --format="%ct")
+        git checkout master
+        master_date=$(git log -1 --format="%ct")
+        date_diff=$(( (master_date - develop_date) / 86400 ))
+        if [[ $date_diff -gt 30 ]]; then
+          echo "A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
+
+          # Criar uma issue
+          echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
+          echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
+          echo "::set-output name=author::$(git log -1 --format="%an")"
+          echo "::set-output name=commit-id::$(git log -1 --format="%H")"
+          echo "::set-output name=commit-message::$(git log -1 --format="%s")"
+          echo "::set-output name=commit-date::$(git log -1 --format="%cd")"
+          echo "::set-output name=assignees::$(git log -1 --format="%an")"
+        fi
+
+    - name: Create Issue on Failed workflow
+      if: ${{ failure() }}
+      uses: dacbd/create-issue-action@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        title: Action workflow failed.
+        body: |
+          ### Context
+          [Failed Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          [Codebase](https://github.com/${{ github.repository }}/tree/${{ github.sha }})
+          Workflow name - `${{ github.workflow }}`
+          Job -           `${{ github.job }}`
+          status -        `${{ job.status }}`
+          **Informações do commit:**
+          - Autor: ${{ steps.branch-comparison.outputs.author }}
+          - ID do commit: ${{ steps.branch-comparison.outputs.commit-id }}
+          - Mensagem do commit: ${{ steps.branch-comparison.outputs.commit-message }}
+          - Data do commit: ${{ steps.branch-comparison.outputs.commit-date }}
+        assignees: ${{ steps.branch-comparison.outputs.assignees }}
