@@ -18,7 +18,8 @@ jobs:
             ISSUES=$(curl -s -H "Authorization: token $TOKEN" "https://api.github.com/repos/$REPO/issues?state=all" | jq -r ".[].title")
             echo "Repositório: $REPO"
             echo "Issues:"
-            echo "$ISSUES"
+            while IFS= read -r ISSUE; do
+              echo "$ISSUE"
+            done <<< "$ISSUES"
             echo "---"
           done
-
