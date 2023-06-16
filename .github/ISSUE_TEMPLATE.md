@@ -2,7 +2,6 @@
 name: Último Commit
 about: Notificação do último commit
 title: '[Notificação] Último Commit'
-assignees: ${{ github.event.head_commit.author.username }}
 labels: notificação, enhancement
 ---
 
