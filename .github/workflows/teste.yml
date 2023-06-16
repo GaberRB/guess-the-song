@@ -14,7 +14,7 @@ jobs:
 
     steps:
     - name: Checkout do repositório
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
     - name: Comparar datas das branches
       run: |
@@ -28,6 +28,7 @@ jobs:
           echo "A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
 
           # Criar uma issue
+          echo "::set-output name=create-issue::true"
           echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
           echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
           echo "::set-output name=author::$(git log -1 --format="%an")"
@@ -35,21 +36,18 @@ jobs:
           echo "::set-output name=commit-message::$(git log -1 --format="%s")"
           echo "::set-output name=commit-date::$(git log -1 --format="%cd")"
           echo "::set-output name=assignees::$(git log -1 --format="%an")"
-        fi
-
+        else
+          echo "::set-output name=create-issue::false"
+          
     - name: Create Issue on Failed workflow
-      if: ${{ failure() }}
+      if: ${{ steps.branch-comparison.outputs.create-issue == 'true' }}
       uses: dacbd/create-issue-action@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        title: Action workflow failed.
+        title: ${{ steps.branch-comparison.outputs.issue-title }}
         body: |
-          ### Context
-          [Failed Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          [Codebase](https://github.com/${{ github.repository }}/tree/${{ github.sha }})
-          Workflow name - `${{ github.workflow }}`
-          Job -           `${{ github.job }}`
-          status -        `${{ job.status }}`
+          ${{ steps.branch-comparison.outputs.issue-body }}
+
           **Informações do commit:**
           - Autor: ${{ steps.branch-comparison.outputs.author }}
           - ID do commit: ${{ steps.branch-comparison.outputs.commit-id }}
