@@ -43,7 +43,7 @@ jobs:
       - name: Verificar usuário existente
         id: check-user
         run: |
-          username="${{ steps.commit-info.outputs.commit-author }}"
+          username="${{ steps.get-github-username.outputs.username }}"
           if [[ -n $username ]]; then
             exists=$(curl -s -o /dev/null -w "%{http_code}" "https://api.github.com/users/$username")
             if [[ $exists == "200" ]]; then
