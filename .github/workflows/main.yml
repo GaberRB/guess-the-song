@@ -59,7 +59,7 @@ jobs:
       uses: JasonEtco/create-an-issue@v2
       with:
         filename: .github/ISSUE_TEMPLATE.md
-        assignees: ${{ steps.commit-info.outputs.commit-author }}
+        assignees: ${{ steps.check-user.outputs.assignees }}
         labels: notificação, enhancement
         update_existing: true
         search_existing: true
