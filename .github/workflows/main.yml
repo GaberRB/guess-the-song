@@ -31,17 +31,23 @@ jobs:
           echo "::set-output name=issue-title::Aviso de Sincronização de Branches"
           echo "::set-output name=issue-body::A branch feat-englishVersion está $date_diff dias à frente da branch main. Por favor, sincronize suas alterações."
         fi
+        
+    - name: Obter informações do último commit
+      id: commit-info
+      run: |
+        last_commit=$(git log -1 --pretty=format:"%h - %an: %s")
+        echo "::set-output name=commit-details::${last_commit}"
 
     - name: Criar issue
       uses: JasonEtco/create-an-issue@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        title: ${{ steps.branch-comparison.outputs.issue-title }}
-        body: ${{ steps.branch-comparison.outputs.issue-body }}
-        assignees: ${{ github.event.head_commit.author.username }}
-        labels: "auto-generated"
+        title: Último Commit
+        body: |
+          Informações do commit:
 
+          Autor: ${{ steps.commit-info.outputs.commit-details }}
 
 
 
