@@ -12,12 +12,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install js-yaml
+        run: npm install js-yaml
+
       - name: List AWS Resources
         id: get_resources
         run: |
-          # Extrair os recursos do arquivo template.yml
-          resources=$(grep "Resources:" template.yml -A 9999 | awk '/^  [A-Za-z0-9]/ {print $1}')
-          echo "::set-output name=resources::$resources"
+          const fs = require('fs');
+          const yaml = require('js-yaml');
+
+          const templatePath = 'template.yml';
+          const templateContents = fs.readFileSync(templatePath, 'utf8');
+          const template = yaml.safeLoad(templateContents);
+
+          const resources = Object.keys(template.Resources || {});
+
+          console.log(resources.join('\n'));
+          console.log("::set-output name=resources::" + JSON.stringify(resources));
 
       - name: Create Issue
         uses: actions/github-script@v4
@@ -25,11 +41,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const title = 'AWS Resources in template.yml';
-            const resources = '${{ steps.get_resources.outputs.resources }}';
+            const resources = JSON.parse('${{ steps.get_resources.outputs.resources }}');
             const body = `
               The following AWS resources are defined in the CloudFormation template:
             
-              ${resources}
+              ${resources.join('\n')}
             `;
 
             const { data } = await github.issues.create({
