@@ -2,13 +2,11 @@ import yaml
 
 template_path = 'template.yml'
 
-with open(template_path, 'r') as file:
-    template = yaml.safe_load(file)
+with open(template_path, 'r') as f:
+    template = yaml.safe_load(f)
 
-resources = [
-    {'name': resource_name, 'type': resource.get('Type')}
-    for resource_name, resource in template.get('Resources', {}).items()
-]
+resources = template.get('Resources', {})
+resource_types = [resource['Type'].replace('AWS::', '') for resource in resources.values()]
 
-with open('resources.txt', 'w') as file:
-    file.write('\n'.join(resource['type'] for resource in resources))
+with open('resources.txt', 'w') as f:
+    f.write('\n'.join(resource_types))
