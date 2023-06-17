@@ -1,0 +1,41 @@
+name: Create Issue with AWS Resources
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create_issue:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Read AWS resources from template.yml
+        id: get_resources
+        run: |
+          resources=$(grep -oP '(?<=^  )\S+' template.yml)
+          echo "::set-output name=resources::$resources"
+
+      - name: Create Issue
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const title = 'AWS Resources in template.yml';
+            const resources = '${{ steps.get_resources.outputs.resources }}';
+            const body = `
+              The following AWS resources are defined in the CloudFormation template:
+
+              ${resources}
+            `;
+
+            const { data } = await github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body
+            });
+            console.log(`Issue created successfully: ${data.html_url}`);
