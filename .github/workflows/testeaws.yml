@@ -17,24 +17,24 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install yaml
-        run: npm install yaml
+      - name: Install js-yaml
+        run: npm install js-yaml
 
       - name: Execute list-resources.js
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            const yaml = require('yaml');
+              const fs = require('fs');
+              const yaml = require('js-yaml');
 
-            const templatePath = 'template.yml';
-            const templateContents = fs.readFileSync(templatePath, 'utf8');
-            const template = yaml.parse(templateContents);
+              const templatePath = 'template.yml';
+              const templateContents = fs.readFileSync(templatePath, 'utf8');
+              const template = yaml.safeLoad(templateContents);
 
-            const resources = Object.keys(template.Resources || []);
+              const resources = Object.keys(template.Resources || []);
 
-            fs.writeFileSync('resources.txt', resources.join('\n'));
+              fs.writeFileSync('resources.txt', resources.join('\n'));
 
       - name: Create Issue
         uses: actions/github-script@v4
