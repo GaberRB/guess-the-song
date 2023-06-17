@@ -1,4 +1,4 @@
-name: List AWS Resources
+name: List AWS Resources and Create Issue
 
 on:
   push:
@@ -21,27 +21,28 @@ jobs:
         run: npm install yaml
 
       - name: Execute list-resources.js
-        run: >
-          const fs = require('fs');
-          const yaml = require('yaml');
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const yaml = require('yaml');
 
-          const templatePath = 'template.yml';
-          const templateContents = fs.readFileSync(templatePath, 'utf8');
-          const template = yaml.parse(templateContents);
+            const templatePath = 'template.yml';
+            const templateContents = fs.readFileSync(templatePath, 'utf8');
+            const template = yaml.parse(templateContents);
 
-          const resources = Object.keys(template.Resources || {});
+            const resources = Object.keys(template.Resources || []);
 
-          console.log(resources.join('\n'));
-          console.log("::set-output name=resources::" + JSON.stringify(resources));
-          process.stdout.write(`::set-output name=resources::${JSON.stringify(resources)}`);
+            fs.writeFileSync('resources.txt', resources.join('\n'));
 
       - name: Create Issue
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const title = 'AWS Resources in template.yml';
-            const resources = JSON.parse('${{ steps.get_resources.outputs.resources }}');
+            const fs = require('fs');
+            const resources = fs.readFileSync('resources.txt', 'utf8').trim().split('\n');
             const body = `
               The following AWS resources are defined in the CloudFormation template:
             
@@ -51,7 +52,7 @@ jobs:
             const { data } = await github.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title,
-              body
+              title: 'AWS Resources in template.yml',
+              body: body
             });
             console.log(`Issue created successfully: ${data.html_url}`);
