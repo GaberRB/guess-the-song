@@ -9,3 +9,4 @@ const resources = Object.keys(template.Resources || {});
 
 console.log(resources.join('\n'));
 console.log("::set-output name=resources::" + JSON.stringify(resources));
+process.stdout.write(`::set-output name=resources::${JSON.stringify(resources)}`);
