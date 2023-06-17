@@ -21,7 +21,7 @@ jobs:
         run: pip install pyyaml
 
       - name: Execute list-resources.py
-        run: python list-resources.py
+        run: python .github/workflows/list-resources.py
 
       - name: Create Issue
         uses: actions/github-script@v4
