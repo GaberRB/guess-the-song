@@ -13,22 +13,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: List AWS Resources
+        id: get_resources
         run: |
           # Extrair os recursos do arquivo template.yml
           resources=$(grep "Resources:" template.yml -A 9999 | awk '/^  [A-Za-z0-9]/ {print $1}')
-
-          # Escrever a lista de recursos no arquivo resources.txt
-          echo "The following AWS resources are defined in the CloudFormation template:" > resources.txt
-          echo >> resources.txt
-          echo "$resources" >> resources.txt
-
-      - name: Create Issue
-        uses: peter-evans/create-issue@v3
-        with:
-          title: 'AWS Resources in template.yml'
-          body-file: resources.txt
-          labels: 'AWS Resources'
-
+          echo "::set-output name=resources::$resources"
 
       - name: Create Issue
         uses: actions/github-script@v4
@@ -39,7 +28,7 @@ jobs:
             const resources = '${{ steps.get_resources.outputs.resources }}';
             const body = `
               The following AWS resources are defined in the CloudFormation template:
-
+            
               ${resources}
             `;
 
