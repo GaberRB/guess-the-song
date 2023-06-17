@@ -17,8 +17,8 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install js-yaml
-        run: npm install js-yaml
+      - name: Install yaml
+        run: npm install yaml
 
       - name: Execute list-resources.js
         run: node list-resources.js
