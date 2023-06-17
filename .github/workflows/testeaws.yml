@@ -21,7 +21,7 @@ jobs:
         run: npm install yaml
 
       - name: Execute list-resources.js
-        run: npm list-resorces.js
+        run: node list-resorces.js
              
       - name: Create Issue
         uses: actions/github-script@v4
