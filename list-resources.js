@@ -1,9 +1,9 @@
 const fs = require('fs');
-const yaml = require('js-yaml');
+const yaml = require('yaml');
 
 const templatePath = 'template.yml';
 const templateContents = fs.readFileSync(templatePath, 'utf8');
-const template = yaml.safeLoad(templateContents);
+const template = yaml.parse(templateContents);
 
 const resources = Object.keys(template.Resources || {});
 
