@@ -1,4 +1,4 @@
-name: Create Issue with AWS Resources
+name: Create Issue with AWS Resource
 
 on:
   push:
