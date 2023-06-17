@@ -20,20 +20,8 @@ jobs:
       - name: Install js-yaml
         run: npm install js-yaml
 
-      - name: List AWS Resources
-        id: get_resources
-        run: |
-          const fs = require('fs');
-          const yaml = require('js-yaml');
-
-          const templatePath = 'template.yml';
-          const templateContents = fs.readFileSync(templatePath, 'utf8');
-          const template = yaml.safeLoad(templateContents);
-
-          const resources = Object.keys(template.Resources || {});
-
-          console.log(resources.join('\n'));
-          console.log("::set-output name=resources::" + JSON.stringify(resources));
+      - name: Execute list-resources.js
+        run: node list-resources.js
 
       - name: Create Issue
         uses: actions/github-script@v4
