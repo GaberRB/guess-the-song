@@ -25,111 +25,38 @@ Parameters:
     Default: public
 
 Resources:
-  CloudWatchLogsRole:
-    Type: AWS::IAM::Role
+  MyBucket:
+    Type: AWS::S3::Bucket
     Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ["ec2.amazonaws.com"]
-            Action: ["sts:AssumeRole"]
-      Policies:
-        - PolicyName: AppLogsPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:GetLogEvents",
-                    "logs:PutLogEvents",
-                    "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
-                    "logs:FilterLogEvents",
-                    "logs:PutRetentionPolicy"
-                  ]
-                Resource: "*"
+      BucketName: my-bucket
 
-  InstanceProfile:
-    Type: "AWS::IAM::InstanceProfile"
+  MyTable:
+    Type: AWS::DynamoDB::Table
     Properties:
-      InstanceProfileName: !Sub ${App}-${AppEnvironment}-CloudWatch
-      Roles:
-        - !Ref CloudWatchLogsRole
+      TableName: my-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: N
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
-  LogGroup:
-    Type: AWS::Logs::LogGroup
+  MyFunction:
+    Type: AWS::Lambda::Function
     Properties:
-      LogGroupName: !Sub /aws/elasticbeanstalk/${App}-${AppEnvironment}/var/log/eb-docker/containers/eb-current-app/stdouterr.log
-      RetentionInDays: 7
+      FunctionName: my-function
+      Runtime: python3.8
+      Handler: index.lambda_handler
+      Code:
+        S3Bucket: my-bucket
+        S3Key: function.zip
+      MemorySize: 256
+      Timeout: 30
 
-  App:
-    Type: "AWS::ElasticBeanstalk::Application"
+  MyQueue:
+    Type: AWS::SQS::Queue
     Properties:
-      ApplicationName: app-name
-      Description: Application description
-  
-  AppVersion:
-    Type: "AWS::ElasticBeanstalk::ApplicationVersion"
-    Properties:
-      ApplicationName: !Ref App
-      Description: String
-      SourceBundle:
-        S3Bucket: s3-bucket-name
-        S3Key: s3-key-name.zip
-
-  AppEnvironment:
-    Type: "AWS::ElasticBeanstalk::Environment"
-    Properties:
-      EnvironmentName: !Sub ${App}-${AppEnvironment}
-      ApplicationName: !Ref App
-      SolutionStackName: "64bit Amazon Linux 2018.03 v2.15.1 running Docker 19.03.6-ce"
-      Tier:
-        Name: WebServer
-        Type: Standard
-        Version: "1.0"
-      VersionLabel: !Ref AppVersion
-      OptionSettings: 
-        - Namespace: aws:elasticbeanstalk:application:environment
-          OptionName: APP_ENV
-          Value: !Ref AppEnvironment
-        - Namespace: aws:elasticbeanstalk:command
-          OptionName: DeploymentPolicy
-          Value: RollingWithAdditionalBatch
-        - Namespace: aws:elasticbeanstalk:command
-          OptionName: BatchSizeType
-          Value: Fixed
-        - Namespace: aws:elasticbeanstalk:command
-          OptionName: BatchSize
-          Value: 1
-        - Namespace: aws:ec2:vpc
-          OptionName: VPCId
-          Value: !Ref AccountVpc
-        - Namespace: aws:ec2:vpc
-          OptionName: Subnets
-          Value: !Ref EC2Subnet
-        - Namespace: "aws:autoscaling:launchconfiguration"
-          OptionName: InstanceType
-          Value: !Ref EC2InstanceType
-        - Namespace: aws:elasticbeanstalk:environment
-          OptionName: EnvironmentType
-          Value: LoadBalanced
-        - Namespace: "aws:elasticbeanstalk:environment"
-          OptionName: LoadBalancerType
-          Value: network
-        - Namespace: "aws:ec2:vpc"
-          OptionName: ELBSubnets
-          Value: !Ref LoadBalancerSubnet
-        - Namespace: "aws:ec2:vpc"
-          OptionName: ELBScheme
-          Value: !Sub ${LoadBalancerVisibility}
-        - Namespace: "aws:autoscaling:launchconfiguration"
-          OptionName: IamInstanceProfile
-          Value: !Ref InstanceProfile
-        - Namespace: aws:elasticbeanstalk:cloudwatch:logs
-          OptionName: StreamLogs
-          Value: true
+      QueueName: my-queue
