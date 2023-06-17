@@ -1,5 +1,5 @@
 const fs = require('fs');
-const YAML = require('yaml');
+const yaml = require('yaml');
 
 const templatePath = 'template.yml';
 const templateContents = fs.readFileSync(templatePath, 'utf8');
