@@ -19,6 +19,9 @@ jobs:
 
       - name: Install yaml
         run: npm install yaml
+        
+      - name: Install axios
+        run: npm install axios
 
       - name: Execute list-resources.js
         run: node list-resources.js
