@@ -1,0 +1,45 @@
+name: List AWS Resources
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  list-resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Execute list-resources.py
+        run: python list-resources.py
+
+      - name: Create Issue
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const resources = fs.readFileSync('resources.txt', 'utf8').trim().split('\n');
+            const body = `
+              The following AWS resources are defined in the CloudFormation template:
+            
+              ${resources.join('\n')}
+            `;
+
+            const { data } = await github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'AWS Resources in template.yml',
+              body: body
+            });
+            console.log(`Issue created successfully: ${data.html_url}`);
