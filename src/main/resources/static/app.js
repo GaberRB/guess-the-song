@@ -48,6 +48,7 @@ const PLAYLISTS = [
 let state = {
     playerName:       '',
     selectedPlaylist: null,
+    searchQuery:      null,
     questions:        [],
     currentIndex:     0,
     score:            0,
@@ -93,6 +94,28 @@ function initWelcomeScreen() {
     // Valida formulário quando o nome muda
     document.getElementById('player-name').addEventListener('input', validatePlayForm);
 
+    // Campo de busca livre com debounce
+    let searchDebounce = null;
+    document.getElementById('search-input').addEventListener('input', (e) => {
+        clearTimeout(searchDebounce);
+        const query = e.target.value.trim();
+        if (query.length === 0) {
+            state.searchQuery = null;
+            setSearchStatus('');
+            validatePlayForm();
+            return;
+        }
+        if (query.length < 2) return;
+        setSearchStatus('🔍 Buscando...');
+        searchDebounce = setTimeout(() => {
+            state.searchQuery = query;
+            state.selectedPlaylist = null;
+            document.querySelectorAll('.genre-card').forEach(c => c.classList.remove('selected'));
+            setSearchStatus(`✅ Quiz para: <strong>${escapeHtml(query)}</strong>`);
+            validatePlayForm();
+        }, 600);
+    });
+
     // Botão play
     document.getElementById('btn-play').addEventListener('click', startGame);
 
@@ -103,6 +126,9 @@ function initWelcomeScreen() {
 
 function selectGenre(id) {
     state.selectedPlaylist = id;
+    state.searchQuery = null;
+    document.getElementById('search-input').value = '';
+    setSearchStatus('');
     document.querySelectorAll('.genre-card').forEach(card => {
         card.classList.toggle('selected', card.dataset.id === id);
     });
@@ -112,7 +138,11 @@ function selectGenre(id) {
 function validatePlayForm() {
     const name = document.getElementById('player-name').value.trim();
     const btn  = document.getElementById('btn-play');
-    btn.disabled = !(name.length >= 2 && state.selectedPlaylist);
+    btn.disabled = !(name.length >= 2 && (state.selectedPlaylist || state.searchQuery));
+}
+
+function setSearchStatus(html) {
+    document.getElementById('search-status').innerHTML = html;
 }
 
 /* ==========================================
@@ -125,7 +155,9 @@ async function startGame() {
     stopAudio();
 
     try {
-        const url      = `${CONFIG.API_BASE_URL}/api/quiz/v1/${state.selectedPlaylist}`;
+        const url = state.searchQuery
+            ? `${CONFIG.API_BASE_URL}/api/quiz/v1/search?q=${encodeURIComponent(state.searchQuery)}`
+            : `${CONFIG.API_BASE_URL}/api/quiz/v1/${state.selectedPlaylist}`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -487,7 +519,9 @@ function showResults() {
    ========================================== */
 
 async function saveScore() {
-    const genreName = PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist;
+    const genreName = state.searchQuery
+        ? state.searchQuery
+        : (PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist);
 
     try {
         await fetch(`${CONFIG.API_BASE_URL}/api/score/v1`, {
@@ -616,7 +650,9 @@ function renderRanking(scores) {
    ========================================== */
 
 function shareResult() {
-    const genreName = PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist;
+    const genreName = state.searchQuery
+        ? state.searchQuery
+        : (PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist);
     const accuracy  = Math.round((state.correctCount / CONFIG.TOTAL_QUESTIONS) * 100);
     const trophy    = document.getElementById('results-trophy').textContent;
 

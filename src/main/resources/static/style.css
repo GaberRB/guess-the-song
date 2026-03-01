@@ -153,6 +153,46 @@ body::before {
 
 .input-label.mt-4 { margin-top: 22px; }
 
+/* ==========================================
+   BUSCA LIVRE
+   ========================================== */
+
+.search-container {
+    position: relative;
+}
+
+.search-field {
+    padding-right: 16px;
+}
+
+.search-status {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    min-height: 18px;
+    padding-left: 2px;
+    transition: opacity 0.2s;
+}
+
+.genre-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 18px 0 10px;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.genre-divider::before,
+.genre-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
 .input-field {
     width: 100%;
     background: var(--bg-secondary);

@@ -42,6 +42,37 @@ public class DeezerService {
         return dataQuizMusic;
     }
 
+    public DataQuizMusic findBySearch(String query) {
+        List<QuizMusic> quizMusics = new ArrayList<>();
+        var response = deezerClient.search(query);
+        Random generator = new Random();
+        var deezer = response.getDeezerResponses();
+        var size = deezer.size();
+        Set<Integer> usedIndices = new HashSet<>();
+        int count = 0;
+
+        for (int attempts = 0; count < 10 && attempts < size * 3; attempts++) {
+            int randCorrect = generator.nextInt(size);
+            if (usedIndices.contains(randCorrect)) continue;
+            usedIndices.add(randCorrect);
+
+            var deezerMusic = deezer.get(randCorrect);
+            var correctAnswer = deezerMusic.getTitulo() + " - " + deezerMusic.getArtista().getNome();
+
+            quizMusic = QuizMusic.builder()
+                    .question(String.valueOf(count + 1) + " - Guess the song?")
+                    .correctAnswer(correctAnswer)
+                    .incorrectAnswers(getIncorrets(deezer, randCorrect, correctAnswer))
+                    .mp3Link(deezerMusic.getLinkPlayer())
+                    .build();
+            quizMusics.add(quizMusic);
+            count++;
+        }
+
+        dataQuizMusic.setQuizMusic(quizMusics);
+        return dataQuizMusic;
+    }
+
     public DataQuizMusic findPlaylistOnDeezerApi(String playlist){
 
         List<QuizMusic> quizMusics = new ArrayList<>();

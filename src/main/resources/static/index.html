@@ -33,7 +33,23 @@
                     autocomplete="off"
                 >
 
-                <label class="input-label mt-4">Escolha o gênero musical</label>
+                <label class="input-label mt-4">Buscar artista ou gênero</label>
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="search-input"
+                        class="input-field search-field"
+                        placeholder="Ex: Coldplay, Samba, Beatles..."
+                        maxlength="60"
+                        autocomplete="off"
+                    >
+                    <div id="search-status" class="search-status"></div>
+                </div>
+
+                <div class="genre-divider">
+                    <span>ou escolha um gênero</span>
+                </div>
+
                 <div id="genre-grid" class="genre-grid">
                     <!-- Gêneros renderizados pelo JS -->
                 </div>
