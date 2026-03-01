@@ -43,6 +43,19 @@
                 🎮 Jogar
             </button>
 
+            <!-- Mini ranking na tela inicial -->
+            <div class="welcome-ranking">
+                <div class="welcome-ranking-header">
+                    <span>🏆 Top Jogadores</span>
+                    <button id="btn-welcome-ranking" class="btn-see-all">Ver todos →</button>
+                </div>
+                <div id="welcome-ranking-list" class="welcome-ranking-list">
+                    <div class="welcome-ranking-loading">
+                        <div class="loader-sm"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Anúncio: tela inicial (usuário está ocioso escolhendo gênero) -->
             <div class="ad-container">
                 <p class="ad-label">Publicidade</p>
@@ -231,9 +244,46 @@
         </div>
     </div>
 
+    <!-- Modal de compartilhamento -->
+    <div id="share-modal" class="share-modal hidden">
+        <div class="share-modal-backdrop"></div>
+        <div class="share-modal-content">
+            <!-- Card que vira imagem -->
+            <div id="share-card" class="share-card">
+                <div class="share-card-logo">🎵 Guess The Song</div>
+                <div class="share-card-trophy" id="share-trophy">🏆</div>
+                <div class="share-card-name" id="share-name">Jogador</div>
+                <div class="share-card-score" id="share-score">0</div>
+                <div class="share-card-label">pontos</div>
+                <div class="share-card-stats">
+                    <div class="share-stat">
+                        <span class="share-stat-val" id="share-correct">0</span>
+                        <span class="share-stat-lbl">Acertos</span>
+                    </div>
+                    <div class="share-stat">
+                        <span class="share-stat-val" id="share-accuracy">0%</span>
+                        <span class="share-stat-lbl">Acurácia</span>
+                    </div>
+                    <div class="share-stat">
+                        <span class="share-stat-val" id="share-genre">-</span>
+                        <span class="share-stat-lbl">Gênero</span>
+                    </div>
+                </div>
+                <div class="share-card-url">music.quizminigames.com</div>
+            </div>
+
+            <div class="share-actions">
+                <button id="btn-share-image" class="btn btn-primary">📸 Salvar imagem</button>
+                <button id="btn-share-text" class="btn btn-secondary">📋 Copiar texto</button>
+                <button id="btn-share-close" class="btn btn-ghost">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast de feedback (copiado/compartilhado) -->
     <div id="toast" class="toast hidden">✅ Copiado para área de transferência!</div>
 
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

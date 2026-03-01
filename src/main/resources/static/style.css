@@ -1011,6 +1011,218 @@ body::before {
 }
 
 /* ==========================================
+   MINI RANKING — TELA INICIAL
+   ========================================== */
+
+.welcome-ranking {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.welcome-ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.btn-see-all {
+    background: none;
+    border: none;
+    color: var(--accent-light);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-see-all:hover { text-decoration: underline; }
+
+.welcome-ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.welcome-ranking-loading {
+    display: flex;
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.loader-sm {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+.welcome-rank-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    font-size: 0.82rem;
+}
+
+.welcome-rank-pos {
+    font-size: 1rem;
+    min-width: 24px;
+    text-align: center;
+}
+
+.welcome-rank-name {
+    flex: 1;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.welcome-rank-genre {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.welcome-rank-score {
+    font-weight: 700;
+    color: var(--accent-light);
+    white-space: nowrap;
+}
+
+/* ==========================================
+   MODAL DE COMPARTILHAMENTO
+   ========================================== */
+
+.share-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.share-modal.hidden { display: none; }
+
+.share-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+}
+
+.share-modal-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.share-card {
+    background: linear-gradient(135deg, #1a0a35 0%, #12122a 50%, #0a1a35 100%);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(124, 58, 237, 0.25);
+}
+
+.share-card-logo {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent-light);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 16px;
+}
+
+.share-card-trophy {
+    font-size: 4rem;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.6));
+}
+
+.share-card-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.share-card-score {
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+
+.share-card-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.share-card-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.share-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.share-stat-val {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.share-stat-lbl {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.share-card-url {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.share-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ==========================================
    RESPONSIVO
    ========================================== */
 

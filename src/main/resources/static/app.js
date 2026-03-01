@@ -95,6 +95,10 @@ function initWelcomeScreen() {
 
     // Botão play
     document.getElementById('btn-play').addEventListener('click', startGame);
+
+    // Mini ranking
+    loadWelcomeRanking();
+    document.getElementById('btn-welcome-ranking').addEventListener('click', () => openRankingFromWelcome());
 }
 
 function selectGenre(id) {
@@ -505,6 +509,50 @@ async function saveScore() {
    RANKING
    ========================================== */
 
+async function loadWelcomeRanking() {
+    const list = document.getElementById('welcome-ranking-list');
+    try {
+        const res    = await fetch(`${CONFIG.API_BASE_URL}/api/score/v1/top`);
+        const scores = await res.json();
+
+        if (!scores || scores.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:var(--text-muted);font-size:0.82rem;padding:8px 0">Ainda não há pontuações. Seja o primeiro!</p>';
+            return;
+        }
+
+        const medals = ['🥇', '🥈', '🥉'];
+        list.innerHTML = scores.slice(0, 5).map((s, i) => `
+            <div class="welcome-rank-item">
+                <span class="welcome-rank-pos">${medals[i] ?? i + 1}</span>
+                <span class="welcome-rank-name">${escapeHtml(s.playerName)}</span>
+                <span class="welcome-rank-genre">${escapeHtml(s.genre)}</span>
+                <span class="welcome-rank-score">${s.totalScore}</span>
+            </div>
+        `).join('');
+    } catch (_) {
+        list.innerHTML = '';
+    }
+}
+
+async function openRankingFromWelcome() {
+    showScreen('screen-ranking');
+    const list    = document.getElementById('ranking-list');
+    const loading = document.getElementById('ranking-loading');
+    list.innerHTML = '';
+    loading.classList.remove('hidden');
+    try {
+        const res    = await fetch(`${CONFIG.API_BASE_URL}/api/score/v1/top`);
+        const scores = await res.json();
+        loading.classList.add('hidden');
+        renderRanking(scores);
+    } catch (_) {
+        loading.classList.add('hidden');
+        list.innerHTML = '<p class="ranking-empty">Não foi possível carregar o ranking.</p>';
+    }
+    document.getElementById('btn-back-ranking').onclick  = () => showScreen('screen-welcome');
+    document.getElementById('btn-ranking-play').onclick  = () => showScreen('screen-welcome');
+}
+
 async function openRanking() {
     showScreen('screen-ranking');
 
@@ -567,30 +615,71 @@ function renderRanking(scores) {
    COMPARTILHAR
    ========================================== */
 
-async function shareResult() {
+function shareResult() {
     const genreName = PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist;
     const accuracy  = Math.round((state.correctCount / CONFIG.TOTAL_QUESTIONS) * 100);
+    const trophy    = document.getElementById('results-trophy').textContent;
 
-    const text =
-        `🎵 Joguei Guess The Song!\n\n` +
-        `👤 ${state.playerName}\n` +
-        `⭐ ${state.score} pontos\n` +
-        `🎯 ${state.correctCount}/10 acertos (${accuracy}%)\n` +
-        `🎶 Gênero: ${genreName}\n\n` +
-        `Tente você também! 👉 ${window.location.href}`;
+    // Preenche o card
+    document.getElementById('share-trophy').textContent   = trophy;
+    document.getElementById('share-name').textContent     = state.playerName;
+    document.getElementById('share-score').textContent    = state.score;
+    document.getElementById('share-correct').textContent  = `${state.correctCount}/10`;
+    document.getElementById('share-accuracy').textContent = `${accuracy}%`;
+    document.getElementById('share-genre').textContent    = genreName;
 
-    if (navigator.share) {
+    // Abre o modal
+    const modal = document.getElementById('share-modal');
+    modal.classList.remove('hidden');
+
+    // Fechar ao clicar no backdrop
+    modal.querySelector('.share-modal-backdrop').onclick = closeShareModal;
+    document.getElementById('btn-share-close').onclick   = closeShareModal;
+
+    // Salvar imagem
+    document.getElementById('btn-share-image').onclick = async () => {
+        const card = document.getElementById('share-card');
         try {
-            await navigator.share({ title: 'Guess The Song 🎵', text });
-        } catch (_) { /* usuário cancelou */ }
-    } else {
-        try {
-            await navigator.clipboard.writeText(text);
-            showToast('✅ Copiado para área de transferência!');
+            const canvas = await html2canvas(card, {
+                backgroundColor: null,
+                scale: 2,
+                useCORS: true,
+            });
+            const link = document.createElement('a');
+            link.download = 'guess-the-song-resultado.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast('✅ Imagem salva!');
         } catch (_) {
-            showToast('❌ Não foi possível copiar. Tente manualmente.');
+            showToast('❌ Não foi possível gerar a imagem.');
         }
-    }
+    };
+
+    // Copiar texto
+    document.getElementById('btn-share-text').onclick = async () => {
+        const text =
+            `🎵 Joguei Guess The Song!\n\n` +
+            `👤 ${state.playerName}\n` +
+            `⭐ ${state.score} pontos\n` +
+            `🎯 ${state.correctCount}/10 acertos (${accuracy}%)\n` +
+            `🎶 Gênero: ${genreName}\n\n` +
+            `Tente você também! 👉 https://music.quizminigames.com`;
+
+        if (navigator.share) {
+            try { await navigator.share({ title: 'Guess The Song 🎵', text }); } catch (_) {}
+        } else {
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast('✅ Copiado para área de transferência!');
+            } catch (_) {
+                showToast('❌ Não foi possível copiar.');
+            }
+        }
+    };
+}
+
+function closeShareModal() {
+    document.getElementById('share-modal').classList.add('hidden');
 }
 
 /* ==========================================
