@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Quiz — Guess The Song 🎵</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="criar.css">
+</head>
+<body>
+
+    <!-- ========== TELA 1: FORMULÁRIO ========== -->
+    <div id="screen-create" class="screen active">
+        <div class="container">
+
+            <div class="criar-header">
+                <a href="/" class="btn-back">← Voltar ao jogo</a>
+                <div class="logo-icon">🎸</div>
+                <h1 class="title">Criar Quiz</h1>
+                <p class="subtitle">Monte um quiz com as músicas que você escolher e compartilhe o link!</p>
+            </div>
+
+            <div class="card">
+                <label class="input-label">Nome do Quiz *</label>
+                <input type="text" id="quiz-name" class="input-field"
+                       placeholder="Ex: Repertório da Banda X" maxlength="60" autocomplete="off">
+
+                <label class="input-label mt-4">Seu Nome *</label>
+                <input type="text" id="creator-name" class="input-field"
+                       placeholder="Ex: João" maxlength="40" autocomplete="off">
+            </div>
+
+            <div class="card">
+                <label class="input-label">Buscar músicas</label>
+                <div class="search-container">
+                    <input type="text" id="track-search" class="input-field search-field"
+                           placeholder="Ex: Metallica, Sweet Child O' Mine..." maxlength="60" autocomplete="off">
+                    <div id="track-search-status" class="search-status"></div>
+                </div>
+
+                <!-- Resultados da busca -->
+                <div id="search-results" class="criar-results hidden"></div>
+            </div>
+
+            <div class="card">
+                <div class="criar-tracklist-header">
+                    <span class="input-label" style="margin-bottom:0">Músicas selecionadas</span>
+                    <span id="track-counter" class="criar-counter">0/10</span>
+                </div>
+                <div id="track-list" class="criar-tracklist">
+                    <p class="criar-empty">Nenhuma música adicionada ainda.</p>
+                </div>
+            </div>
+
+            <button id="btn-create-quiz" class="btn btn-primary btn-large" disabled>
+                🎮 Criar Quiz
+            </button>
+
+        </div>
+    </div>
+
+    <!-- ========== TELA 2: SUCESSO ========== -->
+    <div id="screen-success" class="screen">
+        <div class="container center">
+            <div class="criar-success-card">
+                <div class="criar-success-icon">🎉</div>
+                <h2 class="criar-success-title">Quiz criado!</h2>
+                <p class="criar-success-sub">Compartilhe o link abaixo com os jogadores</p>
+
+                <div class="criar-link-block">
+                    <label class="input-label">Link para jogadores</label>
+                    <div class="criar-link-row">
+                        <input type="text" id="share-link" class="input-field criar-link-input" readonly>
+                        <button class="btn btn-secondary criar-copy-btn" onclick="copyLink('share-link')">Copiar</button>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="btn-share-quiz" style="margin-top:10px">
+                        📤 Compartilhar
+                    </button>
+                </div>
+
+                <div class="criar-link-block criar-admin-block">
+                    <label class="input-label">🔒 Link de edição (guarde este link!)</label>
+                    <div class="criar-link-row">
+                        <input type="text" id="admin-link" class="input-field criar-link-input" readonly>
+                        <button class="btn btn-secondary criar-copy-btn" onclick="copyLink('admin-link')">Copiar</button>
+                    </div>
+                    <p class="criar-admin-warn">⚠️ Só você terá este link. Sem ele não é possível editar o quiz.</p>
+                </div>
+
+                <a href="/" class="btn btn-ghost" style="margin-top:8px">← Voltar ao jogo</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TELA 3: EDIÇÃO ========== -->
+    <div id="screen-edit" class="screen">
+        <div class="container">
+            <div class="criar-header">
+                <a href="/" class="btn-back">← Voltar ao jogo</a>
+                <div class="logo-icon">✏️</div>
+                <h2 class="title" id="edit-quiz-name">Editar Quiz</h2>
+                <p class="subtitle" id="edit-quiz-creator"></p>
+            </div>
+
+            <div class="card">
+                <label class="input-label">Buscar músicas para adicionar</label>
+                <div class="search-container">
+                    <input type="text" id="edit-track-search" class="input-field search-field"
+                           placeholder="Ex: AC/DC, Bohemian Rhapsody..." maxlength="60" autocomplete="off">
+                    <div id="edit-search-status" class="search-status"></div>
+                </div>
+                <div id="edit-search-results" class="criar-results hidden"></div>
+            </div>
+
+            <div class="card">
+                <div class="criar-tracklist-header">
+                    <span class="input-label" style="margin-bottom:0">Músicas do quiz</span>
+                    <span id="edit-track-counter" class="criar-counter">0/10</span>
+                </div>
+                <div id="edit-track-list" class="criar-tracklist">
+                    <p class="criar-empty">Carregando...</p>
+                </div>
+            </div>
+
+            <div id="edit-save-status" class="search-status" style="text-align:center;margin-bottom:12px"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="criar.js"></script>
+</body>
+</html>

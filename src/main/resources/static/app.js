@@ -59,6 +59,7 @@ let state = {
     timeLeft:         CONFIG.QUESTION_TIME,
     answered:         false,
     audioPlaying:     false,
+    customQuizId:     null,   // UUID do quiz personalizado (modo custom)
 };
 
 /* ==========================================
@@ -151,14 +152,19 @@ function setSearchStatus(html) {
    ========================================== */
 
 async function startGame() {
-    state.playerName = document.getElementById('player-name').value.trim();
+    // No modo custom, playerName já foi setado em initCustomQuiz antes de chamar startGame
+    if (!state.customQuizId) {
+        state.playerName = document.getElementById('player-name').value.trim();
+    }
     showScreen('screen-loading');
     stopAudio();
 
     try {
-        const url = state.searchQuery
-            ? `${CONFIG.API_BASE_URL}/api/quiz/v1/search?q=${encodeURIComponent(state.searchQuery)}`
-            : `${CONFIG.API_BASE_URL}/api/quiz/v1/${state.selectedPlaylist}`;
+        const url = state.customQuizId
+            ? `${CONFIG.API_BASE_URL}/api/custom-quiz/v1/${state.customQuizId}/questions`
+            : state.searchQuery
+                ? `${CONFIG.API_BASE_URL}/api/quiz/v1/search?q=${encodeURIComponent(state.searchQuery)}`
+                : `${CONFIG.API_BASE_URL}/api/quiz/v1/${state.selectedPlaylist}`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -543,7 +549,10 @@ function showResults() {
     saveScore();
 
     document.getElementById('btn-play-again').onclick    = () => startGame();
-    document.getElementById('btn-change-genre').onclick  = () => showScreen('screen-welcome');
+    document.getElementById('btn-change-genre').onclick  = () => {
+        if (state.customQuizId) showScreen('screen-custom-welcome');
+        else showScreen('screen-welcome');
+    };
     document.getElementById('btn-view-ranking').onclick  = () => openRanking();
     document.getElementById('btn-share').onclick         = () => shareResult();
 }
@@ -553,6 +562,23 @@ function showResults() {
    ========================================== */
 
 async function saveScore() {
+    // Quiz personalizado: salva no ranking isolado do quiz
+    if (state.customQuizId) {
+        try {
+            await fetch(`${CONFIG.API_BASE_URL}/api/custom-quiz/v1/${state.customQuizId}/score`, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({
+                    playerName:   state.playerName,
+                    totalScore:   state.score,
+                    correctCount: state.correctCount,
+                }),
+            });
+        } catch (_) {}
+        return;
+    }
+
+    // Quiz normal: salva no ranking global
     const genreName = state.searchQuery
         ? state.searchQuery
         : (PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist);
@@ -631,7 +657,10 @@ async function openRanking() {
     loading.classList.remove('hidden');
 
     try {
-        const res    = await fetch(`${CONFIG.API_BASE_URL}/api/score/v1/top`);
+        const url    = state.customQuizId
+            ? `${CONFIG.API_BASE_URL}/api/custom-quiz/v1/${state.customQuizId}/ranking`
+            : `${CONFIG.API_BASE_URL}/api/score/v1/top`;
+        const res    = await fetch(url);
         const scores = await res.json();
         loading.classList.add('hidden');
         renderRanking(scores);
@@ -642,7 +671,8 @@ async function openRanking() {
 
     document.getElementById('btn-back-ranking').onclick  = () => showScreen('screen-results');
     document.getElementById('btn-ranking-play').onclick  = () => {
-        showScreen('screen-welcome');
+        if (state.customQuizId) showScreen('screen-custom-welcome');
+        else showScreen('screen-welcome');
     };
 }
 
@@ -830,6 +860,78 @@ function shuffle(array) {
    INICIALIZAÇÃO
    ========================================== */
 
+/* ==========================================
+   MODO QUIZ PERSONALIZADO
+   ========================================== */
+
+async function initCustomQuiz(quizId) {
+    state.customQuizId = quizId;
+
+    try {
+        const res = await fetch(`${CONFIG.API_BASE_URL}/api/custom-quiz/v1/${quizId}`);
+        if (res.status === 410) {
+            showScreen('screen-welcome');
+            showToast('❌ Este quiz expirou ou não existe.');
+            return;
+        }
+        const quiz = await res.json();
+
+        document.getElementById('custom-quiz-title').textContent   = quiz.name;
+        document.getElementById('custom-quiz-creator').textContent = quiz.creatorName;
+        document.getElementById('custom-player-name').value        = '';
+
+        showScreen('screen-custom-welcome');
+        loadCustomRanking(quizId);
+
+        document.getElementById('custom-player-name').addEventListener('input', () => {
+            const val = document.getElementById('custom-player-name').value.trim();
+            document.getElementById('btn-custom-play').disabled = val.length < 2;
+        });
+
+        document.getElementById('btn-custom-play').onclick = () => {
+            state.playerName = document.getElementById('custom-player-name').value.trim();
+            startGame();
+        };
+
+    } catch (_) {
+        showScreen('screen-welcome');
+        showToast('❌ Não foi possível carregar o quiz.');
+    }
+}
+
+async function loadCustomRanking(quizId) {
+    const list = document.getElementById('custom-ranking-list');
+    try {
+        const res    = await fetch(`${CONFIG.API_BASE_URL}/api/custom-quiz/v1/${quizId}/ranking`);
+        const scores = await res.json();
+        const medals = ['🥇', '🥈', '🥉'];
+
+        if (!scores || scores.length === 0) {
+            list.innerHTML = '<p style="font-size:0.82rem;color:var(--text-muted);text-align:center;padding:8px 0">Nenhuma pontuação ainda. Seja o primeiro!</p>';
+            return;
+        }
+
+        list.innerHTML = scores.map((s, i) => `
+            <div class="welcome-rank-item">
+                <span class="welcome-rank-pos">${medals[i] ?? i + 1}</span>
+                <span class="welcome-rank-name">${escapeHtml(s.playerName)}</span>
+                <span class="welcome-rank-score">${s.totalScore}</span>
+            </div>
+        `).join('');
+    } catch (_) {
+        list.innerHTML = '';
+    }
+}
+
+/* ==========================================
+   INICIALIZAÇÃO
+   ========================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
-    initWelcomeScreen();
+    const quizId = new URLSearchParams(window.location.search).get('quiz');
+    if (quizId) {
+        initCustomQuiz(quizId);
+    } else {
+        initWelcomeScreen();
+    }
 });

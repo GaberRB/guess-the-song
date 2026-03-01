@@ -1,0 +1,141 @@
+package br.com.guesthesong.guesthesong.service;
+
+import br.com.guesthesong.guesthesong.model.*;
+import br.com.guesthesong.guesthesong.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+@Service
+public class CustomQuizService {
+
+    @Autowired private CustomQuizRepository quizRepository;
+    @Autowired private CustomQuizTrackRepository trackRepository;
+    @Autowired private CustomScoreRepository scoreRepository;
+    @Autowired private QuizMusic quizMusic;
+    @Autowired private DataQuizMusic dataQuizMusic;
+
+    public Map<String, String> create(CreateQuizRequest request) {
+        String quizId     = UUID.randomUUID().toString();
+        String adminToken = UUID.randomUUID().toString();
+        String now        = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        String expiresAt  = LocalDateTime.now().plusDays(30).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+        CustomQuiz quiz = CustomQuiz.builder()
+                .id(quizId)
+                .adminToken(adminToken)
+                .name(request.getName())
+                .creatorName(request.getCreatorName())
+                .createdAt(now)
+                .expiresAt(expiresAt)
+                .build();
+        quizRepository.save(quiz);
+
+        for (TrackDto t : request.getTracks()) {
+            trackRepository.save(CustomQuizTrack.builder()
+                    .quizId(quizId)
+                    .title(t.getTitle())
+                    .artist(t.getArtist())
+                    .previewUrl(t.getPreviewUrl())
+                    .build());
+        }
+
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("quizId", quizId);
+        result.put("adminToken", adminToken);
+        return result;
+    }
+
+    public CustomQuiz getInfo(String quizId) {
+        return quizRepository.findById(quizId)
+                .filter(q -> LocalDateTime.parse(q.getExpiresAt(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                        .isAfter(LocalDateTime.now()))
+                .orElse(null);
+    }
+
+    public DataQuizMusic generateQuestions(String quizId) {
+        List<CustomQuizTrack> tracks = trackRepository.findByQuizId(quizId);
+        int size = tracks.size();
+        List<QuizMusic> quizMusics = new ArrayList<>();
+        Random rnd = new Random();
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < size; i++) indices.add(i);
+        Collections.shuffle(indices, rnd);
+
+        for (int i = 0; i < Math.min(10, size); i++) {
+            CustomQuizTrack track = tracks.get(indices.get(i));
+            String correctAnswer  = track.getTitle() + " - " + track.getArtist();
+            List<String> incorrects = getIncorrects(tracks, indices.get(i), correctAnswer, rnd);
+
+            quizMusics.add(QuizMusic.builder()
+                    .question((i + 1) + " - Guess the song?")
+                    .correctAnswer(correctAnswer)
+                    .incorrectAnswers(incorrects)
+                    .mp3Link(track.getPreviewUrl())
+                    .build());
+        }
+
+        dataQuizMusic.setQuizMusic(quizMusics);
+        return dataQuizMusic;
+    }
+
+    private List<String> getIncorrects(List<CustomQuizTrack> tracks, int correctIndex, String correctAnswer, Random rnd) {
+        List<String> incorrects = new ArrayList<>();
+        Set<Integer> used = new HashSet<>();
+        used.add(correctIndex);
+        int size = tracks.size();
+        int attempts = 0;
+
+        while (incorrects.size() < 3 && attempts < size * 3) {
+            attempts++;
+            int idx = rnd.nextInt(size);
+            if (used.contains(idx)) continue;
+            String candidate = tracks.get(idx).getTitle() + " - " + tracks.get(idx).getArtist();
+            if (candidate.equals(correctAnswer)) continue;
+            used.add(idx);
+            incorrects.add(candidate);
+        }
+        return incorrects;
+    }
+
+    public CustomScore saveScore(String quizId, String playerName, int totalScore, int correctCount) {
+        CustomScore score = CustomScore.builder()
+                .quizId(quizId)
+                .playerName(playerName)
+                .totalScore(totalScore)
+                .correctCount(correctCount)
+                .createdAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                .build();
+        return scoreRepository.save(score);
+    }
+
+    public List<CustomScore> getRanking(String quizId) {
+        return scoreRepository.findTop10ByQuizIdOrderByTotalScoreDesc(quizId);
+    }
+
+    public boolean validateAdminToken(String quizId, String token) {
+        return quizRepository.findById(quizId)
+                .map(q -> q.getAdminToken().equals(token))
+                .orElse(false);
+    }
+
+    public CustomQuizTrack addTrack(String quizId, TrackDto dto) {
+        return trackRepository.save(CustomQuizTrack.builder()
+                .quizId(quizId)
+                .title(dto.getTitle())
+                .artist(dto.getArtist())
+                .previewUrl(dto.getPreviewUrl())
+                .build());
+    }
+
+    public void removeTrack(Long trackId) {
+        trackRepository.deleteById(trackId);
+    }
+
+    public List<CustomQuizTrack> getTracks(String quizId) {
+        return trackRepository.findByQuizId(quizId);
+    }
+}
