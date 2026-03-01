@@ -251,6 +251,9 @@ function handleAnswer(clickedBtn, selected, correct) {
     if (state.answered) return;
     state.answered = true;
 
+    // Cancela qualquer autoplay pendente
+    document.getElementById('audio-player').oncanplay = null;
+
     stopTimer();
     pauseAudio();
 
@@ -331,6 +334,9 @@ function stopTimer() {
 function handleTimeUp() {
     if (state.answered) return;
     state.answered = true;
+
+    // Cancela qualquer autoplay pendente antes de mostrar feedback
+    document.getElementById('audio-player').oncanplay = null;
 
     state.wrongCount++;
     pauseAudio();
@@ -415,8 +421,9 @@ function loadAudio(url, autoplay = false) {
     btn.onclick = toggleAudio;
 
     if (autoplay) {
-        // Tenta autoplay assim que houver dados suficientes para reproduzir
-        audio.addEventListener('canplay', () => {
+        // Usa oncanplay (propriedade) em vez de addEventListener para evitar acúmulo de listeners entre questões
+        audio.oncanplay = () => {
+            audio.oncanplay = null;
             audio.play()
                 .then(() => {
                     state.audioPlaying = true;
@@ -428,9 +435,10 @@ function loadAudio(url, autoplay = false) {
                     // Navegador bloqueou o autoplay — pulsa o botão para avisar o usuário
                     btn.classList.add('pulse-play');
                 });
-        }, { once: true });
+        };
         audio.load();
     } else {
+        audio.oncanplay = null;
         audio.load();
     }
 }
