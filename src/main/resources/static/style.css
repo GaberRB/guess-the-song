@@ -789,6 +789,61 @@ body::before {
     line-height: 1.5;
 }
 
+/* Revisão de erros */
+.results-review {
+    width: 100%;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.review-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.review-item {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 3px solid var(--error);
+}
+
+.review-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.review-correct {
+    font-size: 0.9rem;
+    color: #4ade80;
+    font-weight: 600;
+}
+
+.review-wrong {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.review-perfect {
+    font-size: 0.95rem;
+    color: #4ade80;
+    text-align: center;
+    padding: 14px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    margin-bottom: 0;
+}
+
 .results-buttons {
     display: flex;
     flex-direction: column;
