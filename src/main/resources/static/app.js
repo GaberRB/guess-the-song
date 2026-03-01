@@ -54,7 +54,7 @@ let state = {
     score:            0,
     correctCount:     0,
     wrongCount:       0,
-    wrongAnswers:     [],   // { question, selected, correct } — para revisão no final
+    answerHistory:    [],   // { num, song, selected, correct } — revisão completa no final
     timerInterval:    null,
     timeLeft:         CONFIG.QUESTION_TIME,
     answered:         false,
@@ -177,7 +177,7 @@ async function startGame() {
         state.score         = 0;
         state.correctCount  = 0;
         state.wrongCount    = 0;
-        state.wrongAnswers  = [];
+        state.answerHistory = [];
 
         loadQuestion();
         showScreen('screen-quiz');
@@ -276,14 +276,11 @@ function handleAnswer(clickedBtn, selected, correct) {
         const points   = 100 + (state.timeLeft * 5);
         state.score   += points;
         state.correctCount++;
+        state.answerHistory.push({ num: state.currentIndex + 1, song: correct, selected, hit: true });
         showFeedback(true, correct, false, points);
     } else {
         state.wrongCount++;
-        state.wrongAnswers.push({
-            question: `Questão ${state.currentIndex + 1}`,
-            song:     correct,
-            selected: selected,
-        });
+        state.answerHistory.push({ num: state.currentIndex + 1, song: correct, selected, hit: false });
         showFeedback(false, correct, false, 0);
     }
 
@@ -350,11 +347,7 @@ function handleTimeUp() {
 
     const correct = state.questions[state.currentIndex].correct_answer;
 
-    state.wrongAnswers.push({
-        question: `Questão ${state.currentIndex + 1}`,
-        song:     correct,
-        selected: null,   // tempo esgotado — nenhuma escolha
-    });
+    state.answerHistory.push({ num: state.currentIndex + 1, song: correct, selected: null, hit: false });
 
     // Destaca a resposta correta
     document.querySelectorAll('.option-btn').forEach(btn => {
@@ -526,25 +519,23 @@ function showResults() {
     document.getElementById('results-trophy').textContent  = level.trophy;
     document.getElementById('results-message').textContent = level.msg;
 
-    // Revisão dos erros
+    // Revisão questão a questão
     const reviewContainer = document.getElementById('results-review');
-    if (state.wrongAnswers.length === 0) {
-        reviewContainer.innerHTML = '<p class="review-perfect">🎉 Você não errou nenhuma! Perfeito!</p>';
-    } else {
-        reviewContainer.innerHTML = `
-            <h3 class="review-title">O que você errou</h3>
-            ${state.wrongAnswers.map(w => `
-                <div class="review-item">
-                    <span class="review-label">${w.question}</span>
-                    <span class="review-correct">✅ ${escapeHtml(w.song)}</span>
-                    ${w.selected
-                        ? `<span class="review-wrong">❌ Sua resposta: ${escapeHtml(w.selected)}</span>`
-                        : `<span class="review-wrong">⏰ Tempo esgotado</span>`
-                    }
+    reviewContainer.innerHTML = `
+        <h3 class="review-title">Resumo das questões</h3>
+        ${state.answerHistory.map(a => `
+            <div class="review-item ${a.hit ? 'review-item--hit' : 'review-item--miss'}">
+                <div class="review-row">
+                    <span class="review-num">Q${a.num}</span>
+                    <span class="review-badge ${a.hit ? 'review-badge--hit' : 'review-badge--miss'}">
+                        ${a.hit ? '✓ Acertou' : '✗ Errou'}
+                    </span>
                 </div>
-            `).join('')}
-        `;
-    }
+                <span class="review-song">${escapeHtml(a.song)}</span>
+                ${!a.hit ? `<span class="review-selected">${a.selected ? `Sua resposta: ${escapeHtml(a.selected)}` : '⏰ Tempo esgotado'}</span>` : ''}
+            </div>
+        `).join('')}
+    `;
 
     // Salva pontuação no banco (não bloqueia a tela caso falhe)
     saveScore();
