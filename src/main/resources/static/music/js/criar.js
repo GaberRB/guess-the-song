@@ -1,5 +1,5 @@
 /* ==========================================
-   CRIAR QUIZ — Lógica
+   CRIAR QUIZ — Entry point (ES Module)
    ========================================== */
 
 const API = '';
@@ -74,7 +74,7 @@ async function searchTracks(query, resultsId, statusId, onAdd) {
             return;
         }
 
-        container.innerHTML = tracks.slice(0, 15).map((t, i) => `
+        container.innerHTML = tracks.slice(0, 15).map((t) => `
             <div class="criar-result-item">
                 <div class="criar-result-info">
                     <span class="criar-result-title">${escapeHtml(t.title)}</span>
@@ -313,3 +313,9 @@ function formatDate(isoStr) {
     if (!isoStr) return '';
     return isoStr.substring(0, 10).split('-').reverse().join('/');
 }
+
+// Expõe funções usadas em onclick inline no HTML
+window.removeTrack     = removeTrack;
+window.removeTrackEdit = removeTrackEdit;
+window.handleAddClick  = handleAddClick;
+window.copyLink        = copyLink;
