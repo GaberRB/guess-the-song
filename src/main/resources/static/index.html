@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess The Song 🎵</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Google AdSense ─ substitua ca-pub-XXXXXXXXXXXXXXXX pelo seu Publisher ID -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- ========== TELA 1: BOAS-VINDAS ========== -->
+    <div id="screen-welcome" class="screen active">
+        <div class="container">
+            <div class="logo-section">
+                <div class="logo-icon">🎵</div>
+                <h1 class="title">Guess The Song</h1>
+                <p class="subtitle">Ouça o trecho e adivinhe a música!</p>
+            </div>
+
+            <div class="card">
+                <label class="input-label">Seu nome</label>
+                <input
+                    type="text"
+                    id="player-name"
+                    class="input-field"
+                    placeholder="Digite seu nome..."
+                    maxlength="20"
+                    autocomplete="off"
+                >
+
+                <label class="input-label mt-4">Escolha o gênero musical</label>
+                <div id="genre-grid" class="genre-grid">
+                    <!-- Gêneros renderizados pelo JS -->
+                </div>
+            </div>
+
+            <button id="btn-play" class="btn btn-primary btn-large" disabled>
+                🎮 Jogar
+            </button>
+
+            <!-- Anúncio: tela inicial (usuário está ocioso escolhendo gênero) -->
+            <div class="ad-container">
+                <p class="ad-label">Publicidade</p>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="XXXXXXXXXX"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TELA 2: LOADING ========== -->
+    <div id="screen-loading" class="screen">
+        <div class="container center">
+            <div class="loader"></div>
+            <p class="loading-text">Carregando músicas...</p>
+            <p class="loading-sub">Buscando no Deezer</p>
+        </div>
+    </div>
+
+    <!-- ========== TELA 3: QUIZ ========== -->
+    <div id="screen-quiz" class="screen">
+        <div class="container">
+
+            <!-- Header com nome, pontuação e progresso -->
+            <div class="quiz-header">
+                <div class="player-info">
+                    <span class="player-name-display" id="display-player-name">Jogador</span>
+                    <span class="score-display">
+                        ⭐ <span id="display-score">0</span>
+                    </span>
+                </div>
+                <div class="progress-info">
+                    <span id="display-question-num">1</span>
+                    <span class="progress-separator">/</span>
+                    <span>10</span>
+                </div>
+            </div>
+
+            <!-- Barra de progresso -->
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar" style="width: 10%"></div>
+            </div>
+
+            <!-- Timer circular -->
+            <div class="timer-section">
+                <div class="timer-ring">
+                    <svg width="90" height="90" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" class="timer-bg"/>
+                        <circle cx="50" cy="50" r="45" class="timer-progress" id="timer-circle"/>
+                    </svg>
+                    <span id="timer-display" class="timer-number">30</span>
+                </div>
+            </div>
+
+            <!-- Player de áudio -->
+            <div class="audio-card">
+                <div class="audio-icon">🎵</div>
+                <div class="audio-info">
+                    <p class="audio-title">Qual é essa música?</p>
+                    <div id="audio-bars" class="audio-bars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </div>
+                <button id="btn-toggle-audio" class="btn-audio" title="Play / Pause">
+                    ▶
+                </button>
+            </div>
+
+            <audio id="audio-player" preload="auto"></audio>
+
+            <!-- Texto da pergunta -->
+            <p class="question-text" id="question-text">Questão 1 — Qual é essa música?</p>
+
+            <!-- Opções de resposta -->
+            <div id="options-container" class="options-grid">
+                <!-- Gerado pelo JS -->
+            </div>
+
+            <!-- Anúncio discreto: abaixo das opções, usuário já respondeu -->
+            <div class="ad-container ad-container--quiz">
+                <p class="ad-label">Publicidade</p>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                     data-ad-slot="XXXXXXXXXX"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
+
+            <!-- Overlay de feedback (correto/errado) -->
+            <div id="feedback-overlay" class="feedback-overlay hidden">
+                <div id="feedback-content" class="feedback-content">
+                    <div id="feedback-icon" class="feedback-icon">✓</div>
+                    <p id="feedback-text" class="feedback-text">Correto!</p>
+                    <p id="feedback-answer" class="feedback-answer"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TELA 4: RESULTADOS ========== -->
+    <div id="screen-results" class="screen">
+        <div class="container center">
+            <div class="results-card">
+                <div class="results-trophy" id="results-trophy">🏆</div>
+                <h2 class="results-title" id="results-player-name">Parabéns!</h2>
+
+                <div class="score-big" id="results-score">0</div>
+                <p class="score-label">pontos</p>
+
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="stat-correct">0</span>
+                        <span class="stat-label">Acertos</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="stat-wrong">0</span>
+                        <span class="stat-label">Erros</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="stat-accuracy">0%</span>
+                        <span class="stat-label">Acurácia</span>
+                    </div>
+                </div>
+
+                <div class="results-message" id="results-message">Boa tentativa!</div>
+
+                <!-- Anúncio: tela de resultados (usuário pausou entre rodadas) -->
+                <div class="ad-container">
+                    <p class="ad-label">Publicidade</p>
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                         data-ad-slot="XXXXXXXXXX"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
+                    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                </div>
+
+                <div class="results-buttons">
+                    <button id="btn-play-again" class="btn btn-primary">
+                        🔄 Jogar Novamente
+                    </button>
+                    <button id="btn-view-ranking" class="btn btn-secondary">
+                        🏆 Ver Ranking
+                    </button>
+                    <button id="btn-share" class="btn btn-share">
+                        📤 Compartilhar Resultado
+                    </button>
+                    <button id="btn-change-genre" class="btn btn-ghost">
+                        🎵 Trocar Gênero
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TELA 5: RANKING ========== -->
+    <div id="screen-ranking" class="screen">
+        <div class="container">
+            <div class="ranking-header">
+                <button id="btn-back-ranking" class="btn-back">← Voltar</button>
+                <h2 class="ranking-title">🏆 Ranking Global</h2>
+            </div>
+
+            <div id="ranking-loading" class="ranking-loading hidden">
+                <div class="loader"></div>
+                <p>Carregando ranking...</p>
+            </div>
+
+            <div id="ranking-list" class="ranking-list">
+                <!-- Gerado pelo JS -->
+            </div>
+
+            <button id="btn-ranking-play" class="btn btn-primary btn-large" style="margin-top: 24px;">
+                🎮 Jogar Agora
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast de feedback (copiado/compartilhado) -->
+    <div id="toast" class="toast hidden">✅ Copiado para área de transferência!</div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -11,9 +11,5 @@ public class DeezerConfig {
 
     private String url;
     private String urlPlaylist;
-    private String headerHost;
-    private String headerKey;
-    private String host;
-    private String key;
 
 }

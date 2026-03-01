@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -47,40 +44,54 @@ public class DeezerService {
 
     public DataQuizMusic findPlaylistOnDeezerApi(String playlist){
 
-        List<QuizMusic> quizMusics = new ArrayList<QuizMusic>();
+        List<QuizMusic> quizMusics = new ArrayList<>();
         var response = deezerClient.searchPlaylist(playlist);
-        var i = 0;
         Random generator = new Random();
         var deezer = response.getDeezerResponses();
-        var size = response.getDeezerResponses().size();
+        var size = deezer.size();
+        Set<Integer> usedIndices = new HashSet<>();
+        int count = 0;
 
-        for (int j = 0; j < 10; j++) {
-            var randCorrect = generator.nextInt(size);
+        for (int attempts = 0; count < 10 && attempts < size * 3; attempts++) {
+            int randCorrect = generator.nextInt(size);
+            if (usedIndices.contains(randCorrect)) continue;
+            usedIndices.add(randCorrect);
+
             var deezerMusic = deezer.get(randCorrect);
+            var correctAnswer = deezerMusic.getTitulo() + " - " + deezerMusic.getArtista().getNome();
 
             quizMusic = QuizMusic.builder()
-                    .question(String.valueOf(i++) + " - Guess the song?")
-                    .correctAnswer(deezerMusic.getTitulo() +" - "+ deezerMusic.getArtista().getNome())
-                    .incorrectAnswers(getIncorrets(deezer))
+                    .question(String.valueOf(count + 1) + " - Guess the song?")
+                    .correctAnswer(correctAnswer)
+                    .incorrectAnswers(getIncorrets(deezer, randCorrect, correctAnswer))
                     .mp3Link(deezerMusic.getLinkPlayer())
                     .build();
             quizMusics.add(quizMusic);
+            count++;
         }
 
-
         dataQuizMusic.setQuizMusic(quizMusics);
-
         return dataQuizMusic;
     }
 
-    private List<String> getIncorrets(List<DeezerResponse> deezer){
+    private List<String> getIncorrets(List<DeezerResponse> deezer, int correctIndex, String correctAnswer) {
         List<String> incorrectAnswers = new ArrayList<>();
         Random generator = new Random();
-        var size = deezer.size();
-        var randIncorrect = generator.nextInt(size);
-        for (int k = 0; k < 3; k++) {
-            incorrectAnswers.add(deezer.get(randIncorrect + k).getTitulo() +" - "+ deezer.get(randIncorrect + k).getArtista().getNome());
+        int size = deezer.size();
+        Set<Integer> usedIndices = new HashSet<>();
+        usedIndices.add(correctIndex);
+        int attempts = 0;
+
+        while (incorrectAnswers.size() < 3 && attempts < size * 2) {
+            attempts++;
+            int randIndex = generator.nextInt(size);
+            if (usedIndices.contains(randIndex)) continue;
+            String candidate = deezer.get(randIndex).getTitulo() + " - " + deezer.get(randIndex).getArtista().getNome();
+            if (candidate.equals(correctAnswer)) continue;
+            usedIndices.add(randIndex);
+            incorrectAnswers.add(candidate);
         }
+
         return incorrectAnswers;
     }
 

@@ -7,9 +7,6 @@ import br.com.guesthesong.guesthesong.service.deezer.Response.DeezerTracksRespon
 import br.com.guesthesong.guesthesong.utils.PlaylistsDeezer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,20 +25,11 @@ public class DeezerClient {
     private DeezerDataResponse deezerDataResponse;
 
     public DeezerDataResponse search(String cantorOuMusica) {
-        var url = deezerConfig.getUrl() + "search?q="+ cantorOuMusica.replace(" ", "+");
+        var url = deezerConfig.getUrl() + "search?q=" + cantorOuMusica.replace(" ", "+");
         RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(deezerConfig.getHeaderHost(), deezerConfig.getHost());
-        headers.add(deezerConfig.getHeaderKey(), deezerConfig.getKey());
-        HttpEntity<String> entity = new HttpEntity<>("body", headers);
-
-        var response = restTemplate.exchange(url, HttpMethod.GET, entity, DeezerDataResponse.class).getBody().getDeezerResponses();
+        var response = restTemplate.getForObject(url, DeezerDataResponse.class).getDeezerResponses();
         var deezerResponseList = createAQuizWith10Questions(response);
         deezerDataResponse.setDeezerResponses(deezerResponseList);
-
-        log.info("Deezer response: {}", String.valueOf(deezerDataResponse));
-        var s = PlaylistsDeezer.findEnum("rock");
-        log.info("Playlist: {} , ID: {}", s.name(), s.getId());
         return deezerDataResponse;
     }
 
@@ -49,15 +37,9 @@ public class DeezerClient {
         var id = PlaylistsDeezer.findEnum(playlist).getId();
         var url = deezerConfig.getUrlPlaylist() + id;
         RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-//        headers.add(deezerConfig.getHeaderHost(), deezerConfig.getHost());
-//        headers.add(deezerConfig.getHeaderKey(), deezerConfig.getKey());
-        HttpEntity<String> entity = new HttpEntity<>("body", headers);
-        var response = restTemplate.exchange(url, HttpMethod.GET, entity, DeezerTracksResponse.class).getBody().getDeezerDataResponse();
+        var response = restTemplate.getForObject(url, DeezerTracksResponse.class).getDeezerDataResponse();
         var deezerResponseList = createAQuizWith10Questions(response.getDeezerResponses());
         deezerDataResponse.setDeezerResponses(deezerResponseList);
-
-        log.info("Deezer response: {}", String.valueOf(deezerDataResponse));
         return deezerDataResponse;
     }
 
