@@ -672,44 +672,78 @@ function shareResult() {
     modal.querySelector('.share-modal-backdrop').onclick = closeShareModal;
     document.getElementById('btn-share-close').onclick   = closeShareModal;
 
-    // Salvar imagem
+    const viralText =
+        `🎵 Acabei de jogar Guess The Song!\n\n` +
+        `👤 ${state.playerName}\n` +
+        `⭐ ${state.score} pontos\n` +
+        `🎯 ${state.correctCount}/10 acertos (${accuracy}%)\n` +
+        `🎶 Gênero: ${genreName}\n\n` +
+        `Você consegue me superar? 🏆\n` +
+        `👉 https://music.quizminigames.com`;
+
+    // Compartilhar nas redes sociais (nativo mobile)
     document.getElementById('btn-share-image').onclick = async () => {
         const card = document.getElementById('share-card');
+        const btn  = document.getElementById('btn-share-image');
+        btn.disabled = true;
+        btn.textContent = '⏳ Gerando...';
+
         try {
             const canvas = await html2canvas(card, {
                 backgroundColor: null,
                 scale: 2,
                 useCORS: true,
             });
+
+            // Tenta compartilhar com imagem via Web Share API (mobile nativo)
+            if (navigator.canShare) {
+                const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+                const file = new File([blob], 'guess-the-song.png', { type: 'image/png' });
+
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Guess The Song 🎵',
+                        text: viralText,
+                    });
+                    btn.disabled = false;
+                    btn.textContent = '📤 Compartilhar';
+                    return;
+                }
+            }
+
+            // Fallback: tenta compartilhar só texto (sem imagem)
+            if (navigator.share) {
+                await navigator.share({ title: 'Guess The Song 🎵', text: viralText });
+                btn.disabled = false;
+                btn.textContent = '📤 Compartilhar';
+                return;
+            }
+
+            // Fallback desktop: baixa a imagem
             const link = document.createElement('a');
             link.download = 'guess-the-song-resultado.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
-            showToast('✅ Imagem salva!');
-        } catch (_) {
-            showToast('❌ Não foi possível gerar a imagem.');
+            showToast('✅ Imagem salva! Compartilhe nas redes.');
+
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                showToast('❌ Não foi possível compartilhar.');
+            }
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '📤 Compartilhar';
         }
     };
 
-    // Copiar texto
+    // Copiar texto para área de transferência
     document.getElementById('btn-share-text').onclick = async () => {
-        const text =
-            `🎵 Joguei Guess The Song!\n\n` +
-            `👤 ${state.playerName}\n` +
-            `⭐ ${state.score} pontos\n` +
-            `🎯 ${state.correctCount}/10 acertos (${accuracy}%)\n` +
-            `🎶 Gênero: ${genreName}\n\n` +
-            `Tente você também! 👉 https://music.quizminigames.com`;
-
-        if (navigator.share) {
-            try { await navigator.share({ title: 'Guess The Song 🎵', text }); } catch (_) {}
-        } else {
-            try {
-                await navigator.clipboard.writeText(text);
-                showToast('✅ Copiado para área de transferência!');
-            } catch (_) {
-                showToast('❌ Não foi possível copiar.');
-            }
+        try {
+            await navigator.clipboard.writeText(viralText);
+            showToast('✅ Copiado! Cole no WhatsApp, Instagram ou onde quiser.');
+        } catch (_) {
+            showToast('❌ Não foi possível copiar.');
         }
     };
 }
