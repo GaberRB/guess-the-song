@@ -677,7 +677,7 @@ function shareResult() {
         `👤 ${state.playerName}\n` +
         `⭐ ${state.score} pontos\n` +
         `🎯 ${state.correctCount}/10 acertos (${accuracy}%)\n` +
-        `🎶 Gênero: ${genreName}\n\n` +
+        `🎶 Gênero/Artista: ${genreName}\n\n` +
         `Você consegue me superar? 🏆\n` +
         `👉 https://music.quizminigames.com`;
 
