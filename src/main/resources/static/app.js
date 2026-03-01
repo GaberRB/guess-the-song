@@ -259,12 +259,13 @@ function handleAnswer(clickedBtn, selected, correct) {
     stopTimer();
     pauseAudio();
 
-    const isCorrect = (selected === correct);
+    const normalize  = s => s.normalize('NFC').trim();
+    const isCorrect  = normalize(selected) === normalize(correct);
 
     // Marca visual de todas as opções
     document.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
-        if (btn.dataset.answer === correct) {
+        if (normalize(btn.dataset.answer) === normalize(correct)) {
             btn.classList.add('correct');
         } else if (btn === clickedBtn && !isCorrect) {
             btn.classList.add('wrong');
@@ -350,9 +351,10 @@ function handleTimeUp() {
     state.answerHistory.push({ num: state.currentIndex + 1, song: correct, selected: null, hit: false });
 
     // Destaca a resposta correta
+    const normCorrect = correct.normalize('NFC').trim();
     document.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
-        if (btn.dataset.answer === correct) btn.classList.add('correct');
+        if (btn.dataset.answer.normalize('NFC').trim() === normCorrect) btn.classList.add('correct');
     });
 
     showFeedback(false, correct, true, 0);
