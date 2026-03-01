@@ -238,6 +238,8 @@ body::before {
     font-weight: 500;
     color: var(--text-secondary);
     user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .genre-card:hover {
@@ -274,6 +276,8 @@ body::before {
     transition: all 0.2s ease;
     text-decoration: none;
     padding: 14px 28px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .btn:disabled {
@@ -581,6 +585,8 @@ body::before {
     align-items: center;
     gap: 12px;
     line-height: 1.4;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .option-btn:hover:not(:disabled) {
