@@ -153,6 +153,15 @@ function setSearchStatus(html) {
 async function startGame() {
     state.playerName = document.getElementById('player-name').value.trim();
     showScreen('screen-loading');
+
+    // iOS exige que audio.play() seja chamado dentro de um user gesture.
+    // Chamamos play()+pause() imediatamente aqui (ainda dentro do clique)
+    // para desbloquear o contexto de áudio antes do fetch assíncrono.
+    const audio = document.getElementById('audio-player');
+    audio.src = '';
+    try { await audio.play(); } catch (_) {}
+    audio.pause();
+
     stopAudio();
 
     try {
