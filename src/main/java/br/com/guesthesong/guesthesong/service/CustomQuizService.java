@@ -59,8 +59,10 @@ public class CustomQuizService {
     }
 
     public DataQuizMusic generateQuestions(String quizId) {
-        List<CachedTrack> pool = customQuizCacheService.getOrLoad(quizId);
-        int size = pool.size();
+        // Lê direto do banco — previewUrl do Deezer expira em ~15min,
+        // não pode ser cacheado por 15 dias
+        List<CustomQuizTrack> tracks = trackRepository.findByQuizId(quizId);
+        int size = tracks.size();
         List<QuizMusic> quizMusics = new ArrayList<>();
         Random rnd = new Random();
         List<Integer> indices = new ArrayList<>();
@@ -68,9 +70,9 @@ public class CustomQuizService {
         Collections.shuffle(indices, rnd);
 
         for (int i = 0; i < Math.min(10, size); i++) {
-            CachedTrack track = pool.get(indices.get(i));
+            CustomQuizTrack track = tracks.get(indices.get(i));
             String correctAnswer  = track.getTitle() + " - " + track.getArtist();
-            List<String> incorrects = getIncorrects(pool, indices.get(i), correctAnswer, rnd);
+            List<String> incorrects = getIncorrects(tracks, indices.get(i), correctAnswer, rnd);
 
             quizMusics.add(QuizMusic.builder()
                     .question((i + 1) + " - Guess the song?")
@@ -84,18 +86,18 @@ public class CustomQuizService {
         return dataQuizMusic;
     }
 
-    private List<String> getIncorrects(List<CachedTrack> pool, int correctIndex, String correctAnswer, Random rnd) {
+    private List<String> getIncorrects(List<CustomQuizTrack> tracks, int correctIndex, String correctAnswer, Random rnd) {
         List<String> incorrects = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
         used.add(correctIndex);
-        int size = pool.size();
+        int size = tracks.size();
         int attempts = 0;
 
         while (incorrects.size() < 3 && attempts < size * 3) {
             attempts++;
             int idx = rnd.nextInt(size);
             if (used.contains(idx)) continue;
-            String candidate = pool.get(idx).getTitle() + " - " + pool.get(idx).getArtist();
+            String candidate = tracks.get(idx).getTitle() + " - " + tracks.get(idx).getArtist();
             if (candidate.equals(correctAnswer)) continue;
             used.add(idx);
             incorrects.add(candidate);
