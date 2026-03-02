@@ -94,6 +94,6 @@ public class CustomQuizController {
             @RequestHeader("X-Admin-Token") String adminToken) {
         if (!customQuizService.validateAdminToken(id, adminToken))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Token inválido");
-        customQuizService.removeTrack(trackId);
+        customQuizService.removeTrack(id, trackId);
     }
 }

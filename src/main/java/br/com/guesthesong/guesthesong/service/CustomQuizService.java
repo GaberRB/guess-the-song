@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomQuizService {
@@ -15,6 +16,7 @@ public class CustomQuizService {
     @Autowired private CustomQuizRepository quizRepository;
     @Autowired private CustomQuizTrackRepository trackRepository;
     @Autowired private CustomScoreRepository scoreRepository;
+    @Autowired private CustomQuizCacheService customQuizCacheService;
     @Autowired private QuizMusic quizMusic;
     @Autowired private DataQuizMusic dataQuizMusic;
 
@@ -57,8 +59,8 @@ public class CustomQuizService {
     }
 
     public DataQuizMusic generateQuestions(String quizId) {
-        List<CustomQuizTrack> tracks = trackRepository.findByQuizId(quizId);
-        int size = tracks.size();
+        List<CachedTrack> pool = customQuizCacheService.getOrLoad(quizId);
+        int size = pool.size();
         List<QuizMusic> quizMusics = new ArrayList<>();
         Random rnd = new Random();
         List<Integer> indices = new ArrayList<>();
@@ -66,9 +68,9 @@ public class CustomQuizService {
         Collections.shuffle(indices, rnd);
 
         for (int i = 0; i < Math.min(10, size); i++) {
-            CustomQuizTrack track = tracks.get(indices.get(i));
+            CachedTrack track = pool.get(indices.get(i));
             String correctAnswer  = track.getTitle() + " - " + track.getArtist();
-            List<String> incorrects = getIncorrects(tracks, indices.get(i), correctAnswer, rnd);
+            List<String> incorrects = getIncorrects(pool, indices.get(i), correctAnswer, rnd);
 
             quizMusics.add(QuizMusic.builder()
                     .question((i + 1) + " - Guess the song?")
@@ -82,18 +84,18 @@ public class CustomQuizService {
         return dataQuizMusic;
     }
 
-    private List<String> getIncorrects(List<CustomQuizTrack> tracks, int correctIndex, String correctAnswer, Random rnd) {
+    private List<String> getIncorrects(List<CachedTrack> pool, int correctIndex, String correctAnswer, Random rnd) {
         List<String> incorrects = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
         used.add(correctIndex);
-        int size = tracks.size();
+        int size = pool.size();
         int attempts = 0;
 
         while (incorrects.size() < 3 && attempts < size * 3) {
             attempts++;
             int idx = rnd.nextInt(size);
             if (used.contains(idx)) continue;
-            String candidate = tracks.get(idx).getTitle() + " - " + tracks.get(idx).getArtist();
+            String candidate = pool.get(idx).getTitle() + " - " + pool.get(idx).getArtist();
             if (candidate.equals(correctAnswer)) continue;
             used.add(idx);
             incorrects.add(candidate);
@@ -123,6 +125,7 @@ public class CustomQuizService {
     }
 
     public CustomQuizTrack addTrack(String quizId, TrackDto dto) {
+        customQuizCacheService.evict(quizId);
         return trackRepository.save(CustomQuizTrack.builder()
                 .quizId(quizId)
                 .title(dto.getTitle())
@@ -131,7 +134,8 @@ public class CustomQuizService {
                 .build());
     }
 
-    public void removeTrack(Long trackId) {
+    public void removeTrack(String quizId, Long trackId) {
+        customQuizCacheService.evict(quizId);
         trackRepository.deleteById(trackId);
     }
 

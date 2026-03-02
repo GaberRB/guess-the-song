@@ -1,13 +1,16 @@
 package br.com.guesthesong.guesthesong.service.deezer;
 
+import br.com.guesthesong.guesthesong.model.CachedTrack;
 import br.com.guesthesong.guesthesong.model.DataQuizMusic;
 import br.com.guesthesong.guesthesong.model.QuizMusic;
+import br.com.guesthesong.guesthesong.service.TrackCacheService;
 import br.com.guesthesong.guesthesong.service.deezer.Response.DeezerResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -22,32 +25,66 @@ public class DeezerService {
     @Autowired
     private DataQuizMusic dataQuizMusic;
 
-    public DataQuizMusic findMusicOnDeezerApi(String singerOrMusic){
+    @Autowired
+    private TrackCacheService trackCacheService;
+
+    public DataQuizMusic findBySearch(String query) {
+        List<CachedTrack> pool = trackCacheService.getOrFetch(
+                "search:" + query.toLowerCase(),
+                () -> toCachedTracks(deezerClient.search(query).getDeezerResponses())
+        );
+        return buildQuiz(pool);
+    }
+
+    public DataQuizMusic findPlaylistOnDeezerApi(String playlist) {
+        List<CachedTrack> pool = trackCacheService.getOrFetch(
+                playlist.toUpperCase(),
+                () -> toCachedTracks(deezerClient.searchPlaylist(playlist).getDeezerResponses())
+        );
+        return buildQuiz(pool);
+    }
+
+    // Método legado — mantido sem alteração
+    public DataQuizMusic findMusicOnDeezerApi(String singerOrMusic) {
         List<String> incorrectAnswers = Arrays.asList("Wrong Music", "Wrong Music", "Wrong Music");
-        List<QuizMusic> quizMusics = new ArrayList<QuizMusic>();
+        List<QuizMusic> quizMusics = new ArrayList<>();
         var response = deezerClient.search(singerOrMusic);
         var i = 0;
-        for (var deezerMusic:response.getDeezerResponses()) {
+        for (var deezerMusic : response.getDeezerResponses()) {
             quizMusic = QuizMusic.builder()
-                    .question(String.valueOf(i+ 1) + " - Guess the song?")
+                    .question(String.valueOf(i + 1) + " - Guess the song?")
                     .correctAnswer(deezerMusic.getTitulo())
                     .incorrectAnswers(incorrectAnswers)
                     .mp3Link(deezerMusic.getLinkPlayer())
                     .build();
             quizMusics.add(quizMusic);
         }
-
         dataQuizMusic.setQuizMusic(quizMusics);
-
         return dataQuizMusic;
     }
 
-    public DataQuizMusic findBySearch(String query) {
+    // Converte List<DeezerResponse> para List<CachedTrack>
+    private List<CachedTrack> toCachedTracks(List<DeezerResponse> responses) {
+        return responses.stream()
+                .map(r -> CachedTrack.builder()
+                        .title(r.getTitulo())
+                        .artist(r.getArtista().getNome())
+                        .previewUrl(r.getLinkPlayer())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    // Constrói DataQuizMusic a partir de um pool de CachedTrack (sorteia 10, gera alternativas)
+    private DataQuizMusic buildQuiz(List<CachedTrack> pool) {
         List<QuizMusic> quizMusics = new ArrayList<>();
-        var response = deezerClient.search(query);
         Random generator = new Random();
-        var deezer = response.getDeezerResponses();
-        var size = deezer.size();
+        int size = pool.size();
+
+        if (size == 0) {
+            dataQuizMusic.setQuizMusic(quizMusics);
+            return dataQuizMusic;
+        }
+
         Set<Integer> usedIndices = new HashSet<>();
         int count = 0;
 
@@ -56,14 +93,14 @@ public class DeezerService {
             if (usedIndices.contains(randCorrect)) continue;
             usedIndices.add(randCorrect);
 
-            var deezerMusic = deezer.get(randCorrect);
-            var correctAnswer = deezerMusic.getTitulo() + " - " + deezerMusic.getArtista().getNome();
+            CachedTrack track = pool.get(randCorrect);
+            String correctAnswer = track.getTitle() + " - " + track.getArtist();
 
             quizMusic = QuizMusic.builder()
                     .question(String.valueOf(count + 1) + " - Guess the song?")
                     .correctAnswer(correctAnswer)
-                    .incorrectAnswers(getIncorrets(deezer, randCorrect, correctAnswer))
-                    .mp3Link(deezerMusic.getLinkPlayer())
+                    .incorrectAnswers(getIncorrects(pool, randCorrect, correctAnswer, generator))
+                    .mp3Link(track.getPreviewUrl())
                     .build();
             quizMusics.add(quizMusic);
             count++;
@@ -73,42 +110,10 @@ public class DeezerService {
         return dataQuizMusic;
     }
 
-    public DataQuizMusic findPlaylistOnDeezerApi(String playlist){
-
-        List<QuizMusic> quizMusics = new ArrayList<>();
-        var response = deezerClient.searchPlaylist(playlist);
-        Random generator = new Random();
-        var deezer = response.getDeezerResponses();
-        var size = deezer.size();
-        Set<Integer> usedIndices = new HashSet<>();
-        int count = 0;
-
-        for (int attempts = 0; count < 10 && attempts < size * 3; attempts++) {
-            int randCorrect = generator.nextInt(size);
-            if (usedIndices.contains(randCorrect)) continue;
-            usedIndices.add(randCorrect);
-
-            var deezerMusic = deezer.get(randCorrect);
-            var correctAnswer = deezerMusic.getTitulo() + " - " + deezerMusic.getArtista().getNome();
-
-            quizMusic = QuizMusic.builder()
-                    .question(String.valueOf(count + 1) + " - Guess the song?")
-                    .correctAnswer(correctAnswer)
-                    .incorrectAnswers(getIncorrets(deezer, randCorrect, correctAnswer))
-                    .mp3Link(deezerMusic.getLinkPlayer())
-                    .build();
-            quizMusics.add(quizMusic);
-            count++;
-        }
-
-        dataQuizMusic.setQuizMusic(quizMusics);
-        return dataQuizMusic;
-    }
-
-    private List<String> getIncorrets(List<DeezerResponse> deezer, int correctIndex, String correctAnswer) {
+    private List<String> getIncorrects(List<CachedTrack> pool, int correctIndex,
+                                       String correctAnswer, Random generator) {
         List<String> incorrectAnswers = new ArrayList<>();
-        Random generator = new Random();
-        int size = deezer.size();
+        int size = pool.size();
         Set<Integer> usedIndices = new HashSet<>();
         usedIndices.add(correctIndex);
         int attempts = 0;
@@ -117,7 +122,7 @@ public class DeezerService {
             attempts++;
             int randIndex = generator.nextInt(size);
             if (usedIndices.contains(randIndex)) continue;
-            String candidate = deezer.get(randIndex).getTitulo() + " - " + deezer.get(randIndex).getArtista().getNome();
+            String candidate = pool.get(randIndex).getTitle() + " - " + pool.get(randIndex).getArtist();
             if (candidate.equals(correctAnswer)) continue;
             usedIndices.add(randIndex);
             incorrectAnswers.add(candidate);
@@ -125,5 +130,4 @@ public class DeezerService {
 
         return incorrectAnswers;
     }
-
 }
