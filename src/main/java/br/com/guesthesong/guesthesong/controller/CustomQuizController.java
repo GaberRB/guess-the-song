@@ -102,6 +102,17 @@ public class CustomQuizController {
         return quiz;
     }
 
+    @PostMapping("/{id}/fix-previews")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Rebusca previews expirados no Deezer para o quiz (requer token de admin)")
+    public Map<String, Integer> fixPreviews(
+            @PathVariable String id,
+            @RequestHeader("X-Admin-Token") String adminToken) {
+        if (!customQuizService.validateAdminToken(id, adminToken))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Token inválido");
+        return customQuizService.fixExpiredPreviews(id);
+    }
+
     @DeleteMapping("/{id}/track/{trackId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remover track do quiz (requer token de admin)")

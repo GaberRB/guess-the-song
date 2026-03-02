@@ -114,6 +114,20 @@ public class CustomQuizService {
         return url; // retorna a expirada — melhor que nada
     }
 
+    public Map<String, Integer> fixExpiredPreviews(String quizId) {
+        List<CustomQuizTrack> tracks = trackRepository.findByQuizId(quizId);
+        int fixed = 0, failed = 0;
+        for (CustomQuizTrack track : tracks) {
+            if (track.getPreviewUrl() == null || !track.getPreviewUrl().contains("hdnea=")) continue;
+            String fresh = freshPreviewUrl(track);
+            if (!fresh.contains("hdnea=")) fixed++; else failed++;
+        }
+        Map<String, Integer> result = new LinkedHashMap<>();
+        result.put("fixed", fixed);
+        result.put("failed", failed);
+        return result;
+    }
+
     private List<String> getIncorrects(List<CustomQuizTrack> tracks, int correctIndex, String correctAnswer, Random rnd) {
         List<String> incorrects = new ArrayList<>();
         Set<Integer> used = new HashSet<>();
