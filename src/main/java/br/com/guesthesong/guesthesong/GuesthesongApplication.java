@@ -7,11 +7,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import br.com.guesthesong.guesthesong.repository.UsuarioRepository;
 
 import java.util.Arrays;
 
 @SpringBootApplication
+@EnableAsync
 @EnableConfigurationProperties(DeezerConfig.class)
 public class GuesthesongApplication {
 
