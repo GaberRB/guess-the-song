@@ -2,7 +2,6 @@ package br.com.guesthesong.guesthesong.service;
 
 import br.com.guesthesong.guesthesong.model.*;
 import br.com.guesthesong.guesthesong.repository.*;
-import br.com.guesthesong.guesthesong.service.deezer.DeezerClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,7 @@ public class CustomQuizService {
     @Autowired private CustomQuizTrackRepository trackRepository;
     @Autowired private CustomScoreRepository scoreRepository;
     @Autowired private CustomQuizCacheService customQuizCacheService;
-    @Autowired private DeezerClient deezerClient;
+    @Autowired private ItunesClient itunesClient;
     @Autowired private QuizMusic quizMusic;
     @Autowired private DataQuizMusic dataQuizMusic;
 
@@ -91,18 +90,17 @@ public class CustomQuizService {
 
     /**
      * URLs do Deezer com token (hdnea=) expiram em ~15min.
-     * Rebusca o preview pelo título+artista e atualiza o banco para a próxima chamada.
+     * Rebusca o preview via iTunes (URLs permanentes) e atualiza o banco para a próxima chamada.
      */
     private String freshPreviewUrl(CustomQuizTrack track) {
         String url = track.getPreviewUrl();
         if (url == null || !url.contains("hdnea=")) return url;
 
         try {
-            var results = deezerClient.search(track.getTitle() + " " + track.getArtist()).getDeezerResponses();
+            var results = itunesClient.search(track.getTitle() + " " + track.getArtist());
             for (var r : results) {
-                String fresh = toHttps(r.getLinkPlayer());
-                if (fresh != null && !fresh.isBlank() && !fresh.contains("hdnea=")) {
-                    // Salva URL permanente no banco para não rebuscar sempre
+                String fresh = r.getPreviewUrl();
+                if (fresh != null && !fresh.isBlank()) {
                     track.setPreviewUrl(fresh);
                     trackRepository.save(track);
                     return fresh;
@@ -194,7 +192,9 @@ public class CustomQuizService {
 
     public void removeTrack(String quizId, Long trackId) {
         customQuizCacheService.evict(quizId);
-        trackRepository.deleteById(trackId);
+        if (trackRepository.existsById(trackId)) {
+            trackRepository.deleteById(trackId);
+        }
     }
 
     public List<CustomQuizTrack> getTracks(String quizId) {
