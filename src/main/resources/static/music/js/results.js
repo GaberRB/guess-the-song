@@ -62,9 +62,11 @@ export function showResults() {
 }
 
 export function shareResult() {
-    const genreName = state.searchQuery
-        ? state.searchQuery
-        : (PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist);
+    const genreName = state.customQuizId
+        ? (document.getElementById('custom-quiz-title')?.textContent || 'Quiz Personalizado')
+        : state.searchQuery
+            ? state.searchQuery
+            : (PLAYLISTS.find(p => p.id === state.selectedPlaylist)?.name ?? state.selectedPlaylist);
     const accuracy  = Math.round((state.correctCount / CONFIG.TOTAL_QUESTIONS) * 100);
     const trophy    = document.getElementById('results-trophy').textContent;
 
