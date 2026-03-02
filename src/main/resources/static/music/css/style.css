@@ -1387,6 +1387,59 @@ body::before {
 }
 
 /* ==========================================
+   BLOCO DE APOIO
+   ========================================== */
+
+.support-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 14px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.support-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    transition: background 0.18s, color 0.18s;
+}
+
+.support-link--donate {
+    color: var(--text-primary);
+    background: rgba(124, 58, 237, 0.18);
+}
+
+.support-link--donate:hover {
+    background: rgba(124, 58, 237, 0.35);
+}
+
+.support-link--social {
+    color: var(--text-secondary);
+}
+
+.support-link--social:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.support-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+}
+
+/* ==========================================
    RESPONSIVO
    ========================================== */
 
