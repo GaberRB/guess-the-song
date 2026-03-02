@@ -55,6 +55,32 @@ export async function startGame() {
 }
 
 /* ==========================================
+   PROTEÇÃO CONTRA GHOST CLICKS (iOS)
+   ========================================== */
+
+// Timestamp do último loadQuestion — bloqueia eventos nos primeiros 400ms
+let _questionLoadedAt = 0;
+
+function _isTouchDevice() {
+    return navigator.maxTouchPoints > 0;
+}
+
+// Registra o handler correto conforme o dispositivo.
+// iOS: usa touchend + preventDefault para evitar o click sintético 300ms depois.
+// Outros: usa click normalmente.
+function _addAnswerListener(btn, handler) {
+    if (_isTouchDevice()) {
+        btn.addEventListener('touchend', (e) => {
+            e.preventDefault();                        // cancela o click sintético
+            if (Date.now() - _questionLoadedAt < 400) return; // ignora ghost do botão anterior
+            handler();
+        }, { passive: false });
+    } else {
+        btn.addEventListener('click', handler);
+    }
+}
+
+/* ==========================================
    CARREGAR PERGUNTA
    ========================================== */
 
@@ -68,6 +94,7 @@ export function loadQuestion() {
     const q = state.questions[state.currentIndex];
     state.answered = false;
     state.timeLeft = CONFIG.QUESTION_TIME;
+    _questionLoadedAt = Date.now();
 
     document.getElementById('display-player-name').textContent      = state.playerName;
     document.getElementById('display-score').textContent            = state.score;
@@ -92,7 +119,7 @@ export function loadQuestion() {
             <span class="option-letter">${letters[index]}</span>
             <span>${escapeHtml(answer)}</span>
         `;
-        btn.addEventListener('click', () => handleAnswer(btn, answer, q.correct_answer));
+        _addAnswerListener(btn, () => handleAnswer(btn, answer, q.correct_answer));
         container.appendChild(btn);
     });
 

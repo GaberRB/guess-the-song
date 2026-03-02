@@ -19,7 +19,22 @@ export function loadAudio(url, autoplay = false) {
         bars.classList.remove('playing');
     };
 
-    btn.onclick = toggleAudio;
+    // Remove handler anterior antes de registrar novo (evita acúmulo)
+    btn.onclick = null;
+    if (navigator.maxTouchPoints > 0) {
+        // iOS: usa touchend + preventDefault para não gerar click sintético 300ms depois
+        // que poderia cair em um botão de resposta abaixo
+        const handler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleAudio();
+        };
+        btn._touchHandler && btn.removeEventListener('touchend', btn._touchHandler);
+        btn._touchHandler = handler;
+        btn.addEventListener('touchend', handler, { passive: false });
+    } else {
+        btn.onclick = toggleAudio;
+    }
 
     if (autoplay) {
         // Usa oncanplay (propriedade) em vez de addEventListener para evitar acúmulo de listeners entre questões
