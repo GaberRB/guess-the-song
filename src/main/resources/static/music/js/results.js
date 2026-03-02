@@ -83,6 +83,10 @@ export function shareResult() {
     modal.querySelector('.share-modal-backdrop').onclick = closeShareModal;
     document.getElementById('btn-share-close').onclick   = closeShareModal;
 
+    const shareUrl = state.customQuizId
+        ? `${window.location.origin}/?quiz=${state.customQuizId}`
+        : `${window.location.origin}`;
+
     const viralText =
         `🎵 Acabei de jogar Guess The Song!\n\n` +
         `👤 ${state.playerName}\n` +
@@ -90,7 +94,7 @@ export function shareResult() {
         `🎯 ${state.correctCount}/10 acertos (${accuracy}%)\n` +
         `🎶 Gênero/Artista: ${genreName}\n\n` +
         `Você consegue me superar? 🏆\n` +
-        `👉 https://music.quizminigames.com`;
+        `👉 ${shareUrl}`;
 
     document.getElementById('btn-share-image').onclick = async () => {
         const card = document.getElementById('share-card');
@@ -122,7 +126,7 @@ export function shareResult() {
             }
 
             if (navigator.share) {
-                await navigator.share({ title: 'Guess The Song 🎵', text: viralText });
+                await navigator.share({ title: 'Guess The Song 🎵', text: viralText, url: shareUrl });
                 btn.disabled = false;
                 btn.textContent = '📤 Compartilhar';
                 return;
