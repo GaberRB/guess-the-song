@@ -3,9 +3,12 @@ package br.com.guesthesong.guesthesong.service;
 import br.com.guesthesong.guesthesong.model.CachedTrack;
 import br.com.guesthesong.guesthesong.service.deezer.Response.ItunesSearchResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,10 +20,21 @@ public class ItunesClient {
     private static final String ITUNES_URL =
             "https://itunes.apple.com/search?term=%s&entity=song&limit=50&country=US";
 
+    private static RestTemplate buildRestTemplate() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setSupportedMediaTypes(Arrays.asList(
+                MediaType.APPLICATION_JSON,
+                MediaType.valueOf("text/javascript")
+        ));
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(0, converter);
+        return restTemplate;
+    }
+
     public List<CachedTrack> search(String query) {
         try {
             String url = String.format(ITUNES_URL, query.replace(" ", "+"));
-            RestTemplate restTemplate = new RestTemplate();
+            RestTemplate restTemplate = buildRestTemplate();
             ItunesSearchResponse response = restTemplate.getForObject(url, ItunesSearchResponse.class);
 
             if (response == null || response.getResults() == null) {
