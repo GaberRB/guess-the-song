@@ -20,7 +20,7 @@
                 <a href="/" class="btn-back">← Voltar ao jogo</a>
                 <div class="logo-icon">🎸</div>
                 <h1 class="title">Criar Quiz</h1>
-                <p class="subtitle">Monte um quiz com as músicas que você escolher e compartilhe o link!</p>
+                <p class="subtitle">Monte um quiz com as músicas que você escolher e compartilhe o link! Mínimo 10, máximo 30 músicas — a cada partida 10 são sorteadas.</p>
             </div>
 
             <div class="card">
@@ -34,21 +34,29 @@
             </div>
 
             <div class="card">
-                <label class="input-label">Buscar músicas</label>
+                <label class="input-label">Importar playlist do Deezer</label>
+                <div class="criar-import-row">
+                    <input type="text" id="deezer-playlist-url" class="input-field"
+                           placeholder="Cole o link: deezer.com/playlist/123..." autocomplete="off">
+                    <button class="btn btn-secondary" id="btn-import-playlist">Importar</button>
+                </div>
+                <div id="import-status" class="search-status"></div>
+            </div>
+
+            <div class="card">
+                <label class="input-label">Buscar músicas individualmente</label>
                 <div class="search-container">
                     <input type="text" id="track-search" class="input-field search-field"
                            placeholder="Ex: Metallica, Sweet Child O' Mine..." maxlength="60" autocomplete="off">
                     <div id="track-search-status" class="search-status"></div>
                 </div>
-
-                <!-- Resultados da busca -->
                 <div id="search-results" class="criar-results hidden"></div>
             </div>
 
             <div class="card">
                 <div class="criar-tracklist-header">
                     <span class="input-label" style="margin-bottom:0">Músicas selecionadas</span>
-                    <span id="track-counter" class="criar-counter">0/10</span>
+                    <span id="track-counter" class="criar-counter">0/30</span>
                 </div>
                 <div id="track-list" class="criar-tracklist">
                     <p class="criar-empty">Nenhuma música adicionada ainda.</p>
@@ -118,7 +126,7 @@
             <div class="card">
                 <div class="criar-tracklist-header">
                     <span class="input-label" style="margin-bottom:0">Músicas do quiz</span>
-                    <span id="edit-track-counter" class="criar-counter">0/10</span>
+                    <span id="edit-track-counter" class="criar-counter">0/30</span>
                 </div>
                 <div id="edit-track-list" class="criar-tracklist">
                     <p class="criar-empty">Carregando...</p>

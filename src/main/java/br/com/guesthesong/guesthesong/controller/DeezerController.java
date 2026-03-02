@@ -53,6 +53,19 @@ public class DeezerController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/playlist-import")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Import tracks from a public Deezer playlist by numeric ID")
+    public List<TrackDto> importDeezerPlaylist(@RequestParam("id") String playlistId) {
+        return deezerClient.fetchPublicPlaylist(playlistId).getDeezerResponses().stream()
+                .map(t -> TrackDto.builder()
+                        .title(t.getTitulo())
+                        .artist(t.getArtista().getNome())
+                        .previewUrl(t.getLinkPlayer())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     @GetMapping("/{playlist}")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Playlist on deezer")

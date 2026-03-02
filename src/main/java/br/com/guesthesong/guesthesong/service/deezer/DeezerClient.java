@@ -33,6 +33,14 @@ public class DeezerClient {
         return deezerDataResponse;
     }
 
+    public DeezerDataResponse fetchPublicPlaylist(String playlistId) {
+        var url = deezerConfig.getUrl() + "playlist/" + playlistId + "/tracks";
+        RestTemplate restTemplate = new RestTemplate();
+        var response = restTemplate.getForObject(url, DeezerDataResponse.class).getDeezerResponses();
+        deezerDataResponse.setDeezerResponses(createAQuizWith10Questions(response));
+        return deezerDataResponse;
+    }
+
     public DeezerDataResponse searchPlaylist(String playlist) {
         var id = PlaylistsDeezer.findEnum(playlist).getId();
         var url = deezerConfig.getUrlPlaylist() + id;

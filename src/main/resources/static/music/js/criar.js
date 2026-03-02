@@ -47,6 +47,7 @@ function initCreateMode() {
         debounce = setTimeout(() => searchTracks(q, 'search-results', 'track-search-status', addTrack), 600);
     });
 
+    document.getElementById('btn-import-playlist').addEventListener('click', importDeezerPlaylist);
     document.getElementById('btn-create-quiz').addEventListener('click', createQuiz);
 }
 
@@ -54,7 +55,57 @@ function validateCreateForm() {
     const name    = document.getElementById('quiz-name').value.trim();
     const creator = document.getElementById('creator-name').value.trim();
     const btn     = document.getElementById('btn-create-quiz');
-    btn.disabled  = !(name.length >= 2 && creator.length >= 2 && selectedTracks.length === 10);
+    btn.disabled  = !(name.length >= 2 && creator.length >= 2 && selectedTracks.length >= 10);
+}
+
+/* ==========================================
+   IMPORTAR PLAYLIST DO DEEZER
+   ========================================== */
+
+async function importDeezerPlaylist() {
+    const input  = document.getElementById('deezer-playlist-url').value.trim();
+    const status = document.getElementById('import-status');
+
+    // Extrai o ID numérico do link (ex: deezer.com/playlist/1313621735 ou só o número)
+    const match = input.match(/(\d{5,})/);
+    if (!match) {
+        status.innerHTML = '❌ Link inválido. Cole o link completo da playlist do Deezer.';
+        return;
+    }
+
+    const playlistId = match[1];
+    const btn = document.getElementById('btn-import-playlist');
+    btn.disabled    = true;
+    status.innerHTML = '⏳ Importando...';
+
+    try {
+        const res    = await fetch(`${API}/api/quiz/v1/playlist-import?id=${playlistId}`);
+        const tracks = await res.json();
+
+        if (!tracks || tracks.length === 0) {
+            status.innerHTML = '❌ Nenhuma música encontrada nessa playlist.';
+            btn.disabled = false;
+            return;
+        }
+
+        let added = 0;
+        for (const t of tracks) {
+            if (selectedTracks.length >= 30) break;
+            const dup = selectedTracks.find(s => s.title === t.title && s.artist === t.artist);
+            if (!dup && t.previewUrl) {
+                selectedTracks.push({ title: t.title, artist: t.artist, previewUrl: t.previewUrl });
+                added++;
+            }
+        }
+
+        renderTrackList();
+        validateCreateForm();
+        status.innerHTML = `✅ ${added} músicas importadas! (${tracks.length - added} ignoradas: duplicadas ou sem prévia)`;
+    } catch (_) {
+        status.innerHTML = '❌ Erro ao importar. Verifique o link e tente novamente.';
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 /* ==========================================
@@ -102,7 +153,7 @@ function handleAddClick(track, resultsId, statusId) {
    ========================================== */
 
 function addTrack(track) {
-    if (selectedTracks.length >= 10) { showToast('Limite de 10 músicas atingido.'); return; }
+    if (selectedTracks.length >= 30) { showToast('Limite de 30 músicas atingido.'); return; }
     const dup = selectedTracks.find(t => t.title === track.title && t.artist === track.artist);
     if (dup) { showToast('Música já adicionada.'); return; }
     selectedTracks.push(track);
@@ -119,8 +170,8 @@ function removeTrack(index) {
 function renderTrackList() {
     const list    = document.getElementById('track-list');
     const counter = document.getElementById('track-counter');
-    counter.textContent = `${selectedTracks.length}/10`;
-    counter.className   = 'criar-counter' + (selectedTracks.length === 10 ? ' criar-counter--full' : '');
+    counter.textContent = `${selectedTracks.length}/30`;
+    counter.className   = 'criar-counter' + (selectedTracks.length >= 30 ? ' criar-counter--full' : '');
 
     if (selectedTracks.length === 0) {
         list.innerHTML = '<p class="criar-empty">Nenhuma música adicionada ainda.</p>';
@@ -224,7 +275,7 @@ async function loadEditTracks() {
             headers: { 'X-Admin-Token': adminToken },
         });
         const tracks = await res.json();
-        counter.textContent = `${tracks.length}/10`;
+        counter.textContent = `${tracks.length}/30`;
 
         list.innerHTML = tracks.map(t => `
             <div class="criar-track-item">

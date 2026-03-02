@@ -2,6 +2,24 @@
    CRIAR QUIZ — Estilos específicos
    ========================================== */
 
+.criar-import-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.criar-import-row .input-field {
+    flex: 1;
+    min-width: 0;
+}
+
+.criar-import-row .btn {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    font-size: 0.88rem;
+    border-radius: 12px;
+}
+
 .criar-header {
     text-align: center;
     padding: 28px 0 8px;
