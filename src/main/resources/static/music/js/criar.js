@@ -69,7 +69,12 @@ async function importDeezerPlaylist() {
     // Extrai o ID numérico do link (ex: deezer.com/playlist/1313621735 ou só o número)
     const match = input.match(/(\d{5,})/);
     if (!match) {
-        status.innerHTML = '❌ Link inválido. Cole o link completo da playlist do Deezer.';
+        const isShortLink = /link\.deezer\.com/i.test(input);
+        if (isShortLink) {
+            status.innerHTML = '❌ Links encurtados (link.deezer.com) não são suportados. Abra a playlist no Deezer, copie o link completo da barra de endereços e cole aqui.';
+        } else {
+            status.innerHTML = '❌ Link inválido. Cole o link completo da playlist do Deezer (ex: deezer.com/playlist/123456).';
+        }
         return;
     }
 
