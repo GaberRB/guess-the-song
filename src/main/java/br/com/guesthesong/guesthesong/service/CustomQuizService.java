@@ -41,7 +41,7 @@ public class CustomQuizService {
                     .quizId(quizId)
                     .title(t.getTitle())
                     .artist(t.getArtist())
-                    .previewUrl(t.getPreviewUrl())
+                    .previewUrl(toHttps(t.getPreviewUrl()))
                     .build());
         }
 
@@ -132,8 +132,15 @@ public class CustomQuizService {
                 .quizId(quizId)
                 .title(dto.getTitle())
                 .artist(dto.getArtist())
-                .previewUrl(dto.getPreviewUrl())
+                .previewUrl(toHttps(dto.getPreviewUrl()))
                 .build());
+    }
+
+    private String toHttps(String url) {
+        if (url != null && url.startsWith("http://")) {
+            return "https://" + url.substring(7);
+        }
+        return url;
     }
 
     public void removeTrack(String quizId, Long trackId) {

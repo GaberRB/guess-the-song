@@ -69,7 +69,7 @@ public class DeezerService {
                 .map(r -> CachedTrack.builder()
                         .title(r.getTitulo())
                         .artist(r.getArtista().getNome())
-                        .previewUrl(r.getLinkPlayer())
+                        .previewUrl(toHttps(r.getLinkPlayer()))
                         .build())
                 .collect(Collectors.toList());
     }
@@ -129,5 +129,12 @@ public class DeezerService {
         }
 
         return incorrectAnswers;
+    }
+
+    private String toHttps(String url) {
+        if (url != null && url.startsWith("http://")) {
+            return "https://" + url.substring(7);
+        }
+        return url;
     }
 }
