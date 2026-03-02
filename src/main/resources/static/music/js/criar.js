@@ -141,7 +141,7 @@ async function searchTracks(query, resultsId, statusId, onAdd) {
                 </div>
                 <button class="criar-add-btn">+</button>
             `;
-            item.querySelector('.criar-add-btn').addEventListener('click', () => handleAddClick(t, resultsId, statusId));
+            item.querySelector('.criar-add-btn').addEventListener('click', (e) => handleAddClick(t, resultsId, statusId, e.currentTarget));
             container.appendChild(item);
         });
         container.classList.remove('hidden');
@@ -150,11 +150,11 @@ async function searchTracks(query, resultsId, statusId, onAdd) {
     }
 }
 
-function handleAddClick(track, resultsId, statusId) {
+function handleAddClick(track, resultsId, statusId, btn) {
     if (resultsId === 'edit-search-results') {
-        addTrackEdit(track);
+        addTrackEdit(track, btn);
     } else {
-        addTrack(track);
+        addTrack(track, btn);
     }
 }
 
@@ -162,13 +162,14 @@ function handleAddClick(track, resultsId, statusId) {
    GERENCIAR LISTA DE TRACKS (CRIAÇÃO)
    ========================================== */
 
-function addTrack(track) {
+function addTrack(track, btn) {
     if (selectedTracks.length >= 50) { showToast('Limite de 50 músicas atingido.'); return; }
     const dup = selectedTracks.find(t => t.title === track.title && t.artist === track.artist);
     if (dup) { showToast('Música já adicionada.'); return; }
     selectedTracks.push(track);
     renderTrackList();
     validateCreateForm();
+    if (btn) { btn.textContent = '✓'; btn.disabled = true; }
 }
 
 function removeTrack(index) {
@@ -309,20 +310,20 @@ async function loadEditTracks() {
     }
 }
 
-async function addTrackEdit(track) {
-    const status = document.getElementById('edit-save-status');
-    status.innerHTML = '⏳ Adicionando...';
+async function addTrackEdit(track, btn) {
+    if (btn) { btn.textContent = '⏳'; btn.disabled = true; }
     try {
         await fetch(`${API}/api/custom-quiz/v1/${adminQuizId}/track`, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
             body:    JSON.stringify(track),
         });
-        status.innerHTML = '';
+        if (btn) { btn.textContent = '✓'; }
         await loadEditTracks();
         showToast('✅ Música adicionada!');
     } catch (_) {
-        status.innerHTML = '❌ Erro ao adicionar.';
+        if (btn) { btn.textContent = '+'; btn.disabled = false; }
+        showToast('❌ Erro ao adicionar.');
     }
 }
 
