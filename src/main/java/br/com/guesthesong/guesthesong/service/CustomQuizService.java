@@ -2,6 +2,8 @@ package br.com.guesthesong.guesthesong.service;
 
 import br.com.guesthesong.guesthesong.model.*;
 import br.com.guesthesong.guesthesong.repository.*;
+import br.com.guesthesong.guesthesong.service.deezer.DeezerClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CustomQuizService {
 
@@ -17,6 +20,7 @@ public class CustomQuizService {
     @Autowired private CustomQuizTrackRepository trackRepository;
     @Autowired private CustomScoreRepository scoreRepository;
     @Autowired private CustomQuizCacheService customQuizCacheService;
+    @Autowired private DeezerClient deezerClient;
     @Autowired private QuizMusic quizMusic;
     @Autowired private DataQuizMusic dataQuizMusic;
 
@@ -59,8 +63,6 @@ public class CustomQuizService {
     }
 
     public DataQuizMusic generateQuestions(String quizId) {
-        // Lê direto do banco — previewUrl do Deezer expira em ~15min,
-        // não pode ser cacheado por 15 dias
         List<CustomQuizTrack> tracks = trackRepository.findByQuizId(quizId);
         int size = tracks.size();
         List<QuizMusic> quizMusics = new ArrayList<>();
@@ -71,19 +73,45 @@ public class CustomQuizService {
 
         for (int i = 0; i < Math.min(10, size); i++) {
             CustomQuizTrack track = tracks.get(indices.get(i));
-            String correctAnswer  = track.getTitle() + " - " + track.getArtist();
+            String previewUrl = freshPreviewUrl(track);
+            String correctAnswer = track.getTitle() + " - " + track.getArtist();
             List<String> incorrects = getIncorrects(tracks, indices.get(i), correctAnswer, rnd);
 
             quizMusics.add(QuizMusic.builder()
                     .question((i + 1) + " - Guess the song?")
                     .correctAnswer(correctAnswer)
                     .incorrectAnswers(incorrects)
-                    .mp3Link(track.getPreviewUrl())
+                    .mp3Link(previewUrl)
                     .build());
         }
 
         dataQuizMusic.setQuizMusic(quizMusics);
         return dataQuizMusic;
+    }
+
+    /**
+     * URLs do Deezer com token (hdnea=) expiram em ~15min.
+     * Rebusca o preview pelo título+artista e atualiza o banco para a próxima chamada.
+     */
+    private String freshPreviewUrl(CustomQuizTrack track) {
+        String url = track.getPreviewUrl();
+        if (url == null || !url.contains("hdnea=")) return url;
+
+        try {
+            var results = deezerClient.search(track.getTitle() + " " + track.getArtist()).getDeezerResponses();
+            for (var r : results) {
+                String fresh = toHttps(r.getLinkPlayer());
+                if (fresh != null && !fresh.isBlank() && !fresh.contains("hdnea=")) {
+                    // Salva URL permanente no banco para não rebuscar sempre
+                    track.setPreviewUrl(fresh);
+                    trackRepository.save(track);
+                    return fresh;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Não foi possível rebuscar preview para '{}': {}", track.getTitle(), e.getMessage());
+        }
+        return url; // retorna a expirada — melhor que nada
     }
 
     private List<String> getIncorrects(List<CustomQuizTrack> tracks, int correctIndex, String correctAnswer, Random rnd) {
