@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class ItunesClient {
 
     private static final String ITUNES_URL =
-            "https://itunes.apple.com/search?term=%s&entity=song&limit=50";
+            "https://itunes.apple.com/search?term=%s&entity=song&limit=50&country=US";
 
     public List<CachedTrack> search(String query) {
         try {
