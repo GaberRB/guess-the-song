@@ -75,7 +75,7 @@ public class TrackCacheService {
         String itunesQuery = cacheKey.startsWith("search:")
                 ? cacheKey.substring(7)
                 : cacheKey;
-        return itunesClient.search(itunesQuery);
+        return itunesClient.gitsearch(itunesQuery);
     }
 
     private void save(String cacheKey, List<CachedTrack> tracks) {
