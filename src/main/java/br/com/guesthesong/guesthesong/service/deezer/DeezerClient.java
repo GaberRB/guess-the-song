@@ -34,7 +34,7 @@ public class DeezerClient {
     }
 
     public DeezerDataResponse fetchPublicPlaylist(String playlistId) {
-        var url = deezerConfig.getUrl() + "playlist/" + playlistId + "/tracks";
+        var url = deezerConfig.getUrl() + "playlist/" + playlistId + "/tracks?limit=100";
         RestTemplate restTemplate = new RestTemplate();
         var response = restTemplate.getForObject(url, DeezerDataResponse.class).getDeezerResponses();
         deezerDataResponse.setDeezerResponses(createAQuizWith10Questions(response));
