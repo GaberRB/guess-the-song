@@ -290,15 +290,20 @@ async function loadEditTracks() {
         const tracks = await res.json();
         counter.textContent = `${tracks.length}/50`;
 
-        list.innerHTML = tracks.map(t => `
-            <div class="criar-track-item">
+        list.innerHTML = '';
+        tracks.forEach(t => {
+            const item = document.createElement('div');
+            item.className = 'criar-track-item';
+            item.innerHTML = `
                 <div class="criar-track-info">
                     <span class="criar-track-title">${escapeHtml(t.title)}</span>
                     <span class="criar-track-artist">${escapeHtml(t.artist)}</span>
                 </div>
-                <button class="criar-remove-btn" onclick="removeTrackEdit(${t.id})">✕</button>
-            </div>
-        `).join('');
+                <button class="criar-remove-btn">✕</button>
+            `;
+            item.querySelector('.criar-remove-btn').addEventListener('click', () => removeTrackEdit(t.id));
+            list.appendChild(item);
+        });
     } catch (_) {
         list.innerHTML = '<p class="criar-empty">Erro ao carregar músicas.</p>';
     }
@@ -407,7 +412,5 @@ function formatDate(isoStr) {
 }
 
 // Expõe funções usadas em onclick inline no HTML
-window.removeTrack     = removeTrack;
-window.removeTrackEdit = removeTrackEdit;
-window.handleAddClick  = handleAddClick;
-window.copyLink        = copyLink;
+window.removeTrack = removeTrack;
+window.copyLink    = copyLink;
