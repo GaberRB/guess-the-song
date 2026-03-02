@@ -95,7 +95,7 @@ async function importDeezerPlaylist() {
 
         let added = 0;
         for (const t of tracks) {
-            if (selectedTracks.length >= 30) break;
+            if (selectedTracks.length >= 50) break;
             const dup = selectedTracks.find(s => s.title === t.title && s.artist === t.artist);
             if (!dup && t.previewUrl) {
                 selectedTracks.push({ title: t.title, artist: t.artist, previewUrl: t.previewUrl });
@@ -158,7 +158,7 @@ function handleAddClick(track, resultsId, statusId) {
    ========================================== */
 
 function addTrack(track) {
-    if (selectedTracks.length >= 30) { showToast('Limite de 30 músicas atingido.'); return; }
+    if (selectedTracks.length >= 50) { showToast('Limite de 50 músicas atingido.'); return; }
     const dup = selectedTracks.find(t => t.title === track.title && t.artist === track.artist);
     if (dup) { showToast('Música já adicionada.'); return; }
     selectedTracks.push(track);
@@ -175,8 +175,8 @@ function removeTrack(index) {
 function renderTrackList() {
     const list    = document.getElementById('track-list');
     const counter = document.getElementById('track-counter');
-    counter.textContent = `${selectedTracks.length}/30`;
-    counter.className   = 'criar-counter' + (selectedTracks.length >= 30 ? ' criar-counter--full' : '');
+    counter.textContent = `${selectedTracks.length}/50`;
+    counter.className   = 'criar-counter' + (selectedTracks.length >= 50 ? ' criar-counter--full' : '');
 
     if (selectedTracks.length === 0) {
         list.innerHTML = '<p class="criar-empty">Nenhuma música adicionada ainda.</p>';
@@ -280,7 +280,7 @@ async function loadEditTracks() {
             headers: { 'X-Admin-Token': adminToken },
         });
         const tracks = await res.json();
-        counter.textContent = `${tracks.length}/30`;
+        counter.textContent = `${tracks.length}/50`;
 
         list.innerHTML = tracks.map(t => `
             <div class="criar-track-item">
