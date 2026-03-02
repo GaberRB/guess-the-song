@@ -85,6 +85,23 @@ public class CustomQuizController {
         return customQuizService.addTrack(id, dto);
     }
 
+    @PatchMapping("/{id}/name")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Renomear quiz (requer token de admin)")
+    public CustomQuiz rename(
+            @PathVariable String id,
+            @RequestBody Map<String, String> body,
+            @RequestHeader("X-Admin-Token") String adminToken) {
+        if (!customQuizService.validateAdminToken(id, adminToken))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Token inválido");
+        String newName = body.get("name");
+        if (newName == null || newName.isBlank())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome inválido");
+        CustomQuiz quiz = customQuizService.rename(id, newName.trim());
+        if (quiz == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz não encontrado");
+        return quiz;
+    }
+
     @DeleteMapping("/{id}/track/{trackId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Remover track do quiz (requer token de admin)")

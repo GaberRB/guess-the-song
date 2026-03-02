@@ -126,6 +126,13 @@ public class CustomQuizService {
                 .orElse(false);
     }
 
+    public CustomQuiz rename(String quizId, String newName) {
+        CustomQuiz quiz = quizRepository.findById(quizId).orElse(null);
+        if (quiz == null) return null;
+        quiz.setName(newName);
+        return quizRepository.save(quiz);
+    }
+
     public CustomQuizTrack addTrack(String quizId, TrackDto dto) {
         customQuizCacheService.evict(quizId);
         return trackRepository.save(CustomQuizTrack.builder()

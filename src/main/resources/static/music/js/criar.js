@@ -130,15 +130,20 @@ async function searchTracks(query, resultsId, statusId, onAdd) {
             return;
         }
 
-        container.innerHTML = tracks.slice(0, 15).map((t) => `
-            <div class="criar-result-item">
+        container.innerHTML = '';
+        tracks.slice(0, 15).forEach((t) => {
+            const item = document.createElement('div');
+            item.className = 'criar-result-item';
+            item.innerHTML = `
                 <div class="criar-result-info">
                     <span class="criar-result-title">${escapeHtml(t.title)}</span>
                     <span class="criar-result-artist">${escapeHtml(t.artist)}</span>
                 </div>
-                <button class="criar-add-btn" onclick='handleAddClick(${JSON.stringify(t)}, "${resultsId}", "${statusId}")'>+</button>
-            </div>
-        `).join('');
+                <button class="criar-add-btn">+</button>
+            `;
+            item.querySelector('.criar-add-btn').addEventListener('click', () => handleAddClick(t, resultsId, statusId));
+            container.appendChild(item);
+        });
         container.classList.remove('hidden');
     } catch (_) {
         document.getElementById(statusId).innerHTML = '❌ Erro na busca.';
@@ -252,11 +257,14 @@ async function loadEditMode() {
 
         document.getElementById('edit-quiz-name').textContent    = quiz.name;
         document.getElementById('edit-quiz-creator').textContent = `Criado por ${quiz.creatorName} · expira em ${formatDate(quiz.expiresAt)}`;
+        document.getElementById('edit-quiz-name-input').value    = quiz.name;
 
         await loadEditTracks();
     } catch (_) {
         showToast('❌ Não foi possível carregar o quiz.');
     }
+
+    document.getElementById('btn-rename-quiz').addEventListener('click', renameQuiz);
 
     let debounce = null;
     document.getElementById('edit-track-search').addEventListener('input', (e) => {
@@ -326,6 +334,34 @@ async function removeTrackEdit(trackId) {
         showToast('✅ Música removida!');
     } catch (_) {
         status.innerHTML = '❌ Erro ao remover.';
+    }
+}
+
+/* ==========================================
+   RENOMEAR QUIZ
+   ========================================== */
+
+async function renameQuiz() {
+    const input  = document.getElementById('edit-quiz-name-input');
+    const status = document.getElementById('rename-status');
+    const newName = input.value.trim();
+
+    if (newName.length < 2) { showToast('Nome deve ter pelo menos 2 caracteres.'); return; }
+
+    status.innerHTML = '⏳ Salvando...';
+    try {
+        const res = await fetch(`${API}/api/custom-quiz/v1/${adminQuizId}/name`, {
+            method:  'PATCH',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+            body:    JSON.stringify({ name: newName }),
+        });
+        if (!res.ok) throw new Error();
+        const quiz = await res.json();
+        document.getElementById('edit-quiz-name').textContent = quiz.name;
+        status.innerHTML = '';
+        showToast('✅ Nome atualizado!');
+    } catch (_) {
+        status.innerHTML = '❌ Erro ao renomear.';
     }
 }
 
