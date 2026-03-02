@@ -114,14 +114,23 @@ export function shareResult() {
                 const file = new File([blob], 'guess-the-song.png', { type: 'image/png' });
 
                 if (navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Guess The Song 🎵',
-                        text:  viralText,
-                    });
-                    btn.disabled = false;
-                    btn.textContent = '📤 Compartilhar';
-                    return;
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: 'Guess The Song 🎵',
+                            text:  viralText,
+                        });
+                        btn.disabled = false;
+                        btn.textContent = '📤 Compartilhar';
+                        return;
+                    } catch (fileShareErr) {
+                        if (fileShareErr.name === 'AbortError') {
+                            btn.disabled = false;
+                            btn.textContent = '📤 Compartilhar';
+                            return;
+                        }
+                        // Falhou no share com arquivo — tenta só texto abaixo
+                    }
                 }
             }
 
