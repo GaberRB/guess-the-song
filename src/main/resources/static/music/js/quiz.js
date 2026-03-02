@@ -181,10 +181,12 @@ export function handleTimeUp() {
    ========================================== */
 
 export function showFeedback(isCorrect, correctAnswer, timedOut, points) {
-    const overlay = document.getElementById('feedback-overlay');
-    const icon    = document.getElementById('feedback-icon');
-    const text    = document.getElementById('feedback-text');
-    const answer  = document.getElementById('feedback-answer');
+    const overlay  = document.getElementById('feedback-overlay');
+    const icon     = document.getElementById('feedback-icon');
+    const text     = document.getElementById('feedback-text');
+    const answer   = document.getElementById('feedback-answer');
+    const bar      = document.getElementById('feedback-progress-bar');
+    const colorKey = isCorrect ? 'success' : 'error';
 
     if (timedOut) {
         icon.textContent   = '⏰';
@@ -205,6 +207,12 @@ export function showFeedback(isCorrect, correctAnswer, timedOut, points) {
         text.className     = 'feedback-text error';
         answer.textContent = `Resposta: ${correctAnswer}`;
     }
+
+    // Barra de progresso: indica quando a próxima questão vai aparecer
+    bar.style.animation = 'none';
+    bar.className       = `feedback-progress-bar ${colorKey}`;
+    bar.offsetWidth;    // força reflow para reiniciar a animação
+    bar.style.animation = `feedback-fill ${CONFIG.FEEDBACK_DELAY}ms linear forwards`;
 
     overlay.classList.remove('hidden');
 }

@@ -652,7 +652,10 @@ body::before {
     color: #fff;
 }
 
-.option-btn:disabled { cursor: not-allowed; }
+.option-btn:disabled {
+    cursor: default;
+    pointer-events: none;
+}
 
 /* ==========================================
    OVERLAY DE FEEDBACK
@@ -668,9 +671,17 @@ body::before {
     z-index: 200;
     backdrop-filter: blur(6px);
     animation: fadeIn 0.2s ease;
+    /* Bloqueia qualquer clique/toque enquanto o overlay está visível */
+    pointer-events: all;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-.feedback-overlay.hidden { display: none; }
+.feedback-overlay.hidden {
+    display: none;
+    pointer-events: none;
+}
 
 .feedback-content {
     text-align: center;
@@ -716,6 +727,30 @@ body::before {
     color: var(--text-secondary);
     max-width: 300px;
     line-height: 1.5;
+}
+
+/* Barra de progresso do delay — indica ao usuário quando a próxima questão virá */
+.feedback-progress {
+    width: 120px;
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 3px;
+    margin: 18px auto 0;
+    overflow: hidden;
+}
+
+.feedback-progress-bar {
+    height: 100%;
+    border-radius: 3px;
+    width: 0%;
+}
+
+.feedback-progress-bar.success { background: var(--success); }
+.feedback-progress-bar.error   { background: var(--error); }
+
+@keyframes feedback-fill {
+    from { width: 0%; }
+    to   { width: 100%; }
 }
 
 /* ==========================================
