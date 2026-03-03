@@ -78,10 +78,9 @@
 
             <!-- Bloco de apoio -->
             <div class="support-bar">
-                <a href="https://nubank.com.br/cobrar/49kxc/69a5674a-8e2f-4baf-a284-93d0ba76f583"
-                   target="_blank" rel="noopener" class="support-link support-link--donate">
+                <button id="btn-donate" class="support-link support-link--donate">
                     ☕ Apoiar o projeto
-                </a>
+                </button>
                 <span class="support-divider"></span>
                 <a href="https://instagram.com/gabrielriosb"
                    target="_blank" rel="noopener" class="support-link support-link--social"
@@ -350,6 +349,24 @@
                 <button id="btn-share-text" class="btn btn-secondary">📋 Copiar texto</button>
                 <button id="btn-share-close" class="btn btn-ghost">Fechar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de doação Pix -->
+    <div id="donate-modal" class="donate-modal hidden">
+        <div class="donate-modal-backdrop" id="donate-backdrop"></div>
+        <div class="donate-modal-content">
+            <div class="donate-modal-icon">☕</div>
+            <h3 class="donate-modal-title">Apoiar o projeto</h3>
+            <p class="donate-modal-text">
+                Se curtiu o jogo, qualquer valor ajuda a manter o servidor no ar!<br>
+                É um Pix — aceito qualquer valor com muito carinho. 🙏
+            </p>
+            <div class="donate-pix-box" id="donate-pix-key">
+                nubank.com.br/cobrar/49kxc/69a5674a-8e2f-4baf-a284-93d0ba76f583
+            </div>
+            <button class="btn btn-primary" id="btn-copy-pix">📋 Copiar link do Pix</button>
+            <button class="btn btn-ghost" id="btn-donate-close">Fechar</button>
         </div>
     </div>
 

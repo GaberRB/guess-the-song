@@ -1453,6 +1453,73 @@ body::before {
 }
 
 /* ==========================================
+   MODAL DE DOAÇÃO
+   ========================================== */
+
+.donate-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.donate-modal.hidden { display: none; }
+
+.donate-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+}
+
+.donate-modal-content {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.donate-modal-icon {
+    font-size: 2.5rem;
+}
+
+.donate-modal-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.donate-modal-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.donate-pix-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    word-break: break-all;
+    text-align: left;
+    user-select: all;
+}
+
+/* ==========================================
    RESPONSIVO
    ========================================== */
 
