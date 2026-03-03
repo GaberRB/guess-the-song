@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Modal de doação
-    const PIX_LINK = 'https://nubank.com.br/cobrar/49kxc/69a5674a-8e2f-4baf-a284-93d0ba76f583';
+    const PIX_LINK = '00020126410014BR.GOV.BCB.PIX0119grios0311@gmail.com5204000053039865802BR5920Gabriel Rios Belmiro6009SAO PAULO62140510kHaanMhl7Z6304A556';
     const modal    = document.getElementById('donate-modal');
 
     document.getElementById('btn-donate').addEventListener('click', () => {
