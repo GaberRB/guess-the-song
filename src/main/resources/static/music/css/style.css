@@ -1516,6 +1516,18 @@ body::before {
     margin: 0;
 }
 
+.donate-qrcode {
+    display: flex;
+    justify-content: center;
+    padding: 4px 0;
+}
+
+.donate-qrcode canvas {
+    border-radius: 12px;
+    background: #fff;
+    padding: 8px;
+}
+
 .donate-pix-box {
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--border);
