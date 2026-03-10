@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw compile)",
+      "Bash(curl -s \"https://raw.githubusercontent.com/pythonhigh/wordlist-pt/main/words.txt\")",
+      "Bash(grep -E '^[a-zA-Z]{5}$')",
+      "Bash(curl -s \"https://raw.githubusercontent.com/fserb/pt-wordle/main/all.txt\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/pt_BR/pt_BR_50k.txt\")",
+      "Read(//c/Users/grios/OneDrive/Desktop/artigos/guess-the-song/**)",
+      "Bash(curl -s --max-time 10 \"https://raw.githubusercontent.com/niceholgate/wordle-pt/main/palavras.txt\")",
+      "Bash(sqlite3 guessthesong.db \"SELECT COUNT\\(*\\) FROM wordle_word;\")"
+    ]
+  }
+}

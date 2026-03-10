@@ -7,7 +7,14 @@
       "WebFetch(domain:developers.google.com)",
       "WebFetch(domain:www.dhiwise.com)",
       "WebFetch(domain:techcrunch.com)",
-      "WebFetch(domain:zaosoula.github.io)"
+      "WebFetch(domain:zaosoula.github.io)",
+      "Bash(where k6)",
+      "Bash(winget list k6)",
+      "Bash(curl -s http://localhost:8081/api/quiz/v1/ROCK)",
+      "Bash(curl -s \"http://localhost:8081/api/quiz/v1/search?q=Beatles\")",
+      "Bash(curl -s \"http://localhost:8081/api/quiz/v1/POP\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''results count:'', len\\(d.get\\(''results'',[]\\)\\), ''| keys:'', list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(python -c \":*)"
     ]
   }
 }
