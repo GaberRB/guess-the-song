@@ -92,12 +92,16 @@ export function renderRanking(scores) {
         const date          = s.createdAt ? s.createdAt.substring(0, 10) : '';
         const dateFormatted = date ? date.split('-').reverse().join('/') : '';
 
+        const subtitle = s.genre
+            ? `${escapeHtml(s.genre)} · ${dateFormatted}`
+            : dateFormatted;
+
         return `
             <div class="ranking-item ${isMe ? 'ranking-item--me' : ''}">
                 <span class="rank-medal">${medal}</span>
                 <div class="rank-info">
                     <span class="rank-name">${escapeHtml(s.playerName)}</span>
-                    <span class="rank-genre">${escapeHtml(s.genre)} · ${dateFormatted}</span>
+                    <span class="rank-genre">${subtitle}</span>
                 </div>
                 <div class="rank-right">
                     <span class="rank-score">${s.totalScore}</span>

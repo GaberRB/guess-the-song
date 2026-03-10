@@ -5,6 +5,7 @@ import { startGame } from './quiz.js';
 
 export async function initCustomQuiz(quizId) {
     state.customQuizId = quizId;
+    showScreen('screen-loading');
 
     try {
         const res = await fetch(`${CONFIG.API_BASE_URL}/api/custom-quiz/v1/${quizId}`);
