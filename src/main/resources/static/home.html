@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Mini Games — Escolha seu jogo</title>
+    <meta name="description" content="Dois jogos gratuitos num só lugar: adivinhe músicas no Guess The Song e teste seu vocabulário no Palavras BR.">
+
+    <!-- AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg:          #0a0a1a;
+            --bg2:         #12122a;
+            --card:        #1a1a35;
+            --card-hover:  #22224a;
+            --accent:      #7c3aed;
+            --accent-d:    #5b21b6;
+            --accent-l:    #a78bfa;
+            --glow:        rgba(124, 58, 237, 0.35);
+            --green:       #10b981;
+            --green-glow:  rgba(16, 185, 129, 0.35);
+            --text:        #ffffff;
+            --text2:       #a0a0c0;
+            --border:      rgba(255,255,255,0.07);
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Fundo animado ── */
+        .bg-particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .bg-particles span {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.12;
+            animation: float linear infinite;
+        }
+        .bg-particles span:nth-child(1)  { width:300px; height:300px; background:var(--accent);  top:10%;  left:5%;   animation-duration:22s; }
+        .bg-particles span:nth-child(2)  { width:200px; height:200px; background:var(--green);   top:60%;  left:80%;  animation-duration:18s; animation-delay:-6s; }
+        .bg-particles span:nth-child(3)  { width:150px; height:150px; background:var(--accent-l);top:80%;  left:20%;  animation-duration:28s; animation-delay:-10s; }
+        .bg-particles span:nth-child(4)  { width:250px; height:250px; background:var(--accent-d);top:30%;  left:70%;  animation-duration:24s; animation-delay:-4s; }
+        @keyframes float {
+            0%   { transform: translateY(0) scale(1); }
+            50%  { transform: translateY(-60px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        /* ── Layout ── */
+        .page {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        header {
+            text-align: center;
+            padding: 56px 24px 32px;
+        }
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124,58,237,0.15);
+            border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 100px;
+            padding: 6px 18px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-l);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .logo-badge span { font-size: 1rem; }
+        h1 {
+            font-size: clamp(2rem, 6vw, 3.6rem);
+            font-weight: 900;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 30%, var(--accent-l) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+        .subtitle {
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            color: var(--text2);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        /* ── AdSense topo ── */
+        .ad-top {
+            max-width: 728px;
+            margin: 0 auto 20px;
+            padding: 0 16px;
+            text-align: center;
+            min-height: 90px;
+        }
+
+        /* ── Grid de jogos ── */
+        .games-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 16px 48px;
+        }
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text2);
+            margin-bottom: 28px;
+        }
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 780px;
+        }
+
+        /* ── Card de jogo ── */
+        .game-card {
+            position: relative;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px 32px 32px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+            display: block;
+        }
+        .game-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .game-card:hover {
+            transform: translateY(-6px);
+        }
+        .game-card:active { transform: translateY(-2px) scale(0.99); }
+
+        /* Music card */
+        .game-card.music {
+            border-color: rgba(124,58,237,0.3);
+        }
+        .game-card.music::before {
+            background: radial-gradient(ellipse at 30% 0%, rgba(124,58,237,0.18) 0%, transparent 70%);
+        }
+        .game-card.music:hover {
+            box-shadow: 0 20px 60px var(--glow);
+            border-color: rgba(124,58,237,0.6);
+        }
+        .game-card.music::before { opacity: 1; }
+
+        /* Words card */
+        .game-card.words {
+            border-color: rgba(16,185,129,0.3);
+        }
+        .game-card.words::before {
+            background: radial-gradient(ellipse at 30% 0%, rgba(16,185,129,0.18) 0%, transparent 70%);
+        }
+        .game-card.words:hover {
+            box-shadow: 0 20px 60px var(--green-glow);
+            border-color: rgba(16,185,129,0.6);
+        }
+        .game-card.words::before { opacity: 1; }
+
+        /* Card interno */
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+            filter: drop-shadow(0 0 20px currentColor);
+        }
+        .card-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 100px;
+            padding: 3px 10px;
+            margin-bottom: 12px;
+        }
+        .music .card-tag {
+            background: rgba(124,58,237,0.2);
+            color: var(--accent-l);
+            border: 1px solid rgba(124,58,237,0.4);
+        }
+        .words .card-tag {
+            background: rgba(16,185,129,0.15);
+            color: var(--green);
+            border: 1px solid rgba(16,185,129,0.4);
+        }
+        .card-title {
+            font-size: 1.55rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        .card-desc {
+            font-size: 0.88rem;
+            color: var(--text2);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        /* Pills de recursos */
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+        .pill {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text2);
+        }
+
+        /* Botão CTA */
+        .card-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.15s;
+            pointer-events: none; /* o card inteiro é clicável */
+        }
+        .music .card-btn {
+            background: linear-gradient(135deg, var(--accent), var(--accent-d));
+            color: #fff;
+            box-shadow: 0 4px 24px var(--glow);
+        }
+        .words .card-btn {
+            background: linear-gradient(135deg, var(--green), #059669);
+            color: #fff;
+            box-shadow: 0 4px 24px var(--green-glow);
+        }
+        .game-card:hover .card-btn { filter: brightness(1.1); }
+        .btn-arrow {
+            transition: transform 0.2s;
+        }
+        .game-card:hover .btn-arrow { transform: translateX(4px); }
+
+        /* Badge "Em breve" */
+        .coming-soon-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(245,158,11,0.2);
+            border: 1px solid rgba(245,158,11,0.5);
+            color: #f59e0b;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 100px;
+        }
+
+        /* ── AdSense meio ── */
+        .ad-mid {
+            max-width: 780px;
+            margin: 16px auto 0;
+            padding: 0 16px;
+            width: 100%;
+            text-align: center;
+            min-height: 90px;
+        }
+
+        /* ── Mais jogos (placeholder) ── */
+        .more-section {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 40px 16px 0;
+            width: 100%;
+        }
+        .more-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text2);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .more-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .more-card {
+            background: var(--card);
+            border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.45;
+            cursor: default;
+        }
+        .more-card-icon { font-size: 2rem; }
+        .more-card-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text2);
+        }
+        .more-card-tag {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(245,158,11,0.8);
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 100px;
+            padding: 2px 8px;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 32px 16px 40px;
+            color: var(--text2);
+            font-size: 0.78rem;
+        }
+
+        /* ── AdSense rodapé ── */
+        .ad-bottom {
+            max-width: 728px;
+            margin: 0 auto 24px;
+            padding: 0 16px;
+            text-align: center;
+            min-height: 90px;
+        }
+
+        /* ── Animação de entrada ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        header    { animation: fadeUp 0.6s ease both; }
+        .ad-top   { animation: fadeUp 0.6s ease 0.1s both; }
+        .game-card.music { animation: fadeUp 0.6s ease 0.2s both; }
+        .game-card.words { animation: fadeUp 0.6s ease 0.35s both; }
+        .more-section    { animation: fadeUp 0.6s ease 0.5s both; }
+
+        /* ── Mobile ── */
+        @media (max-width: 520px) {
+            header { padding: 40px 20px 24px; }
+            .games-grid { grid-template-columns: 1fr; }
+            .game-card { padding: 28px 24px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Partículas de fundo -->
+<div class="bg-particles" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+</div>
+
+<div class="page">
+
+    <!-- ══ HEADER ══ -->
+    <header>
+        <div class="logo-badge"><span>🎮</span> Quiz Mini Games</div>
+        <h1>Escolha seu<br>desafio de hoje</h1>
+        <p class="subtitle">Jogos gratuitos, direto no navegador. Sem cadastro, sem download.</p>
+    </header>
+
+    <!-- ══ ADSENSE TOPO ══ -->
+    <div class="ad-top">
+        <!-- AdSense — leaderboard 728×90 -->
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <!-- ══ JOGOS ══ -->
+    <section class="games-section">
+        <p class="section-label">Jogos disponíveis</p>
+
+        <div class="games-grid">
+
+            <!-- MUSIC -->
+            <a href="/index.html" class="game-card music">
+                <span class="card-icon">🎵</span>
+                <span class="card-tag">Música</span>
+                <h2 class="card-title">Guess The Song</h2>
+                <p class="card-desc">Ouça o trecho e adivinhe a música antes do tempo acabar. Sobe no ranking global!</p>
+                <div class="card-features">
+                    <span class="pill">🎧 Preview de áudio</span>
+                    <span class="pill">⏱ Contagem regressiva</span>
+                    <span class="pill">🏆 Ranking</span>
+                    <span class="pill">🔗 Quiz personalizado</span>
+                </div>
+                <button class="card-btn">
+                    Jogar agora
+                    <span class="btn-arrow">→</span>
+                </button>
+            </a>
+
+            <!-- WORDS -->
+            <a href="/words" class="game-card words">
+                <span class="card-icon">🟩</span>
+                <span class="card-tag">Palavras</span>
+                <h2 class="card-title">Palavras BR</h2>
+                <p class="card-desc">Descubra a palavra do dia em até 6 tentativas. Quatro modos: Solo, Duo, Quarteto e Desafio.</p>
+                <div class="card-features">
+                    <span class="pill">📅 Palavra do dia</span>
+                    <span class="pill">4️⃣ Modos de jogo</span>
+                    <span class="pill">🏆 Ranking diário</span>
+                    <span class="pill">📤 Compartilhar</span>
+                </div>
+                <button class="card-btn">
+                    Jogar agora
+                    <span class="btn-arrow">→</span>
+                </button>
+            </a>
+
+        </div>
+
+        <!-- ══ ADSENSE MEIO ══ -->
+        <div class="ad-mid">
+            <!-- AdSense — rectangle / responsive -->
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                 data-ad-slot="XXXXXXXXXX"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+        <!-- ══ MAIS JOGOS (em breve) ══ -->
+        <div class="more-section">
+            <p class="more-label">Em breve</p>
+            <div class="more-grid">
+                <div class="more-card">
+                    <span class="more-card-icon">❓</span>
+                    <span class="more-card-name">Novo Jogo</span>
+                    <span class="more-card-tag">Em breve</span>
+                </div>
+                <div class="more-card">
+                    <span class="more-card-icon">🧩</span>
+                    <span class="more-card-name">Novo Jogo</span>
+                    <span class="more-card-tag">Em breve</span>
+                </div>
+                <div class="more-card">
+                    <span class="more-card-icon">⚡</span>
+                    <span class="more-card-name">Novo Jogo</span>
+                    <span class="more-card-tag">Em breve</span>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ══ ADSENSE RODAPÉ ══ -->
+    <div class="ad-bottom">
+        <!-- AdSense — leaderboard / responsive -->
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+             data-ad-slot="XXXXXXXXXX"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <!-- ══ FOOTER ══ -->
+    <footer>
+        <p>© 2025 Quiz Mini Games · Feito com ❤️ no Brasil</p>
+    </footer>
+
+</div>
+
+</body>
+</html>

@@ -26,6 +26,9 @@ services:
     entrypoint: >
       sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
              --email seu@email.com --agree-tos --no-eff-email
+             -d quizminigames.com -d www.quizminigames.com
+             && certbot certonly --webroot --webroot-path=/var/www/certbot
+             --email seu@email.com --agree-tos --no-eff-email
              -d music.quizminigames.com
              && certbot certonly --webroot --webroot-path=/var/www/certbot
              --email seu@email.com --agree-tos --no-eff-email
