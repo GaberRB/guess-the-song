@@ -1,0 +1,113 @@
+/* Duo-specific styles */
+
+.app--duo {
+    max-width: 680px;
+}
+
+.duo-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #7c3aed, #db2777);
+    color: #fff;
+    font-size: 0.65em;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.08em;
+}
+
+.duo-boards {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+    padding: 0 4px;
+    margin-bottom: 12px;
+}
+
+.duo-board-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.duo-board-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 0.3s;
+}
+
+.duo-board-label.solved {
+    color: var(--tile-correct);
+}
+
+.duo-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+    margin: 0 8px;
+}
+
+.board--duo {
+    gap: 4px;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.board--duo .board-row {
+    gap: 4px;
+}
+
+.board--duo .tile {
+    width: 46px;
+    height: 46px;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 400px) {
+    .board--duo .tile {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+    .duo-divider { margin: 0 4px; }
+}
+
+/* Result words */
+.duo-result-words {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.duo-result-word {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.duo-result-word-label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.duo-result-word-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+}
+
+.duo-result-word-value.solved {
+    color: var(--tile-correct);
+}
