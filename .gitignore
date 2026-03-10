@@ -32,4 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 guessthesong.db
+guessthesong.db-shm
+guessthesong.db-wal
 load-test.js
