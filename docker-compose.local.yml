@@ -1,0 +1,29 @@
+services:
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nginx-local
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "8082:8082"
+    volumes:
+      - ./nginx-local/conf.d:/etc/nginx/conf.d:ro
+      - ./landing-page:/usr/share/nginx/landing-page:ro
+      - ./words:/usr/share/nginx/words:ro
+    depends_on:
+      - guessthesong
+
+  guessthesong:
+    build: .
+    container_name: guessthesong-local
+    restart: unless-stopped
+    expose:
+      - "8081"
+    volumes:
+      - guessthesong_data_local:/data
+    environment:
+      - TZ=America/Sao_Paulo
+
+volumes:
+  guessthesong_data_local:

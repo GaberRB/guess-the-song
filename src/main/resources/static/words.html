@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavras BR — Adivinhe a palavra do dia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="words/css/style.css">
+</head>
+<body>
+
+    <div class="app">
+        <header class="header">
+            <a href="https://music.quizminigames.com" class="header-back" title="Guess The Song">🎵</a>
+            <div class="header-center">
+                <h1 class="header-title">Palavras BR</h1>
+                <span class="stage-badge stage-badge--solo" id="stage-badge">Solo</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="btn-ranking" title="Ranking">🏆</button>
+                <button class="icon-btn" id="btn-help" title="Como jogar">❓</button>
+            </div>
+        </header>
+
+        <div class="top-bar">
+            <div class="date-badge" id="date-badge">Carregando...</div>
+            <div class="attempts-counter" id="attempts-counter"></div>
+        </div>
+
+        <!-- Boards rendered dynamically by board.js -->
+        <div id="boards-container" class="boards-container boards-count-1"></div>
+
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard"></div>
+    </div>
+
+    <!-- Modal: resultado do estágio -->
+    <div id="modal-result" class="modal hidden">
+        <div class="modal-backdrop" id="result-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-icon" id="result-icon">🎉</div>
+            <h2 class="modal-title" id="result-title"></h2>
+            <p class="modal-subtitle" id="result-subtitle"></p>
+            <div id="result-words" class="result-words"></div>
+            <div id="result-emoji" class="result-emoji"></div>
+            <button class="btn btn-accent hidden" id="btn-next-stage">Próximo nível</button>
+            <button class="btn btn-retry hidden" id="btn-retry">🔄 Tentar novamente</button>
+            <button class="btn btn-primary" id="btn-share">Compartilhar</button>
+            <button class="btn btn-secondary" id="btn-show-ranking">🏆 Ver Ranking</button>
+            <button class="btn btn-ghost" id="btn-result-close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal: ranking -->
+    <div id="modal-ranking" class="modal hidden">
+        <div class="modal-backdrop" id="ranking-backdrop"></div>
+        <div class="modal-content">
+            <h2 class="modal-title">🏆 Ranking do Dia</h2>
+            <p class="modal-subtitle" id="ranking-date-label"></p>
+            <div id="ranking-list" class="ranking-list">
+                <div class="ranking-loading"><div class="loader-sm"></div></div>
+            </div>
+            <button class="btn btn-ghost" id="btn-ranking-close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal: como jogar -->
+    <div id="modal-help" class="modal hidden">
+        <div class="modal-backdrop" id="help-backdrop"></div>
+        <div class="modal-content">
+            <h2 class="modal-title">Como Jogar</h2>
+            <div class="help-body">
+                <p>Adivinhe palavras do dia em 4 níveis progressivos:</p>
+                <div class="help-stages">
+                    <div class="help-stage">🟩 <strong>Solo</strong> — 1 palavra, 6 tentativas</div>
+                    <div class="help-stage">🟩🟩 <strong>Duo</strong> — 2 palavras, 7 tentativas</div>
+                    <div class="help-stage">🟩🟩🟩🟩 <strong>Quarteto</strong> — 4 palavras, 9 tentativas</div>
+                    <div class="help-stage">🟩×6 <strong>Desafio</strong> — 6 palavras, 12 tentativas</div>
+                </div>
+                <p>Acerte todas para avançar ao próximo nível!</p>
+                <p>Se nao acertar, a palavra é revelada mesmo assim.</p>
+                <div class="help-examples">
+                    <p class="help-ex-label">🟩 Letra certa no lugar certo</p>
+                    <p class="help-ex-label">🟨 Letra certa no lugar errado</p>
+                    <p class="help-ex-label">⬛ Letra que nao esta na palavra</p>
+                </div>
+            </div>
+            <button class="btn btn-primary" id="btn-help-close">Entendi!</button>
+        </div>
+    </div>
+
+    <!-- Modal: nome do jogador -->
+    <div id="modal-name" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-icon">🟩</div>
+            <h2 class="modal-title">Palavras BR</h2>
+            <p class="modal-subtitle">Comece pelo Solo e avance até o Desafio — 4 níveis!</p>
+            <input type="text" id="player-name-input" class="input-field"
+                   placeholder="Seu nome..." maxlength="20" autocomplete="off">
+            <button class="btn btn-primary" id="btn-start">🎮 Jogar</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="words/js/main.js"></script>
+</body>
+</html>

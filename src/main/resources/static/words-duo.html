@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palavras BR Duo — Adivinhe as duas palavras do dia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="words/css/style.css">
+    <link rel="stylesheet" href="words/css/duo.css">
+</head>
+<body>
+
+    <div class="app app--duo">
+        <!-- Header -->
+        <header class="header">
+            <a href="/words.html" class="header-back" title="Palavras BR">🟩</a>
+            <h1 class="header-title">Palavras <span class="duo-badge">DUO</span></h1>
+            <div class="header-actions">
+                <button class="icon-btn" id="btn-ranking" title="Ranking">🏆</button>
+                <button class="icon-btn" id="btn-help" title="Como jogar">❓</button>
+            </div>
+        </header>
+
+        <div class="date-badge" id="date-badge">Carregando...</div>
+
+        <!-- Dois boards -->
+        <div class="duo-boards">
+            <div class="duo-board-wrap">
+                <div class="duo-board-label" id="label-board-1">Palavra 1</div>
+                <div id="board-1" class="board board--duo"></div>
+            </div>
+            <div class="duo-divider"></div>
+            <div class="duo-board-wrap">
+                <div class="duo-board-label" id="label-board-2">Palavra 2</div>
+                <div id="board-2" class="board board--duo"></div>
+            </div>
+        </div>
+
+        <!-- Keyboard -->
+        <div id="keyboard" class="keyboard"></div>
+    </div>
+
+    <!-- Modal: resultado -->
+    <div id="modal-result" class="modal hidden">
+        <div class="modal-backdrop" id="result-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-icon" id="result-icon">🎉</div>
+            <h2 class="modal-title" id="result-title">Parabens!</h2>
+            <p class="modal-subtitle" id="result-subtitle"></p>
+            <div class="duo-result-words" id="duo-result-words"></div>
+            <div id="result-emoji" class="result-emoji"></div>
+            <button class="btn btn-primary" id="btn-share">Compartilhar</button>
+            <button class="btn btn-secondary" id="btn-show-ranking">🏆 Ver Ranking</button>
+            <button class="btn btn-ghost" id="btn-result-close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal: ranking -->
+    <div id="modal-ranking" class="modal hidden">
+        <div class="modal-backdrop" id="ranking-backdrop"></div>
+        <div class="modal-content">
+            <h2 class="modal-title">🏆 Ranking Duo do Dia</h2>
+            <p class="modal-subtitle" id="ranking-date-label"></p>
+            <div id="ranking-list" class="ranking-list">
+                <div class="ranking-loading"><div class="loader-sm"></div></div>
+            </div>
+            <button class="btn btn-ghost" id="btn-ranking-close">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Modal: como jogar -->
+    <div id="modal-help" class="modal hidden">
+        <div class="modal-backdrop" id="help-backdrop"></div>
+        <div class="modal-content">
+            <h2 class="modal-title">Como Jogar — DUO</h2>
+            <div class="help-body">
+                <p>Adivinhe <strong>DUAS PALAVRAS</strong> ao mesmo tempo em 6 tentativas.</p>
+                <p>Cada tentativa e validada nas duas grades simultaneamente.</p>
+                <p>Voce vence somente quando acertar <strong>as duas</strong>!</p>
+                <div class="help-examples">
+                    <p class="help-ex-label">🟩 Letra certa no lugar certo</p>
+                    <p class="help-ex-label">🟨 Letra certa no lugar errado</p>
+                    <p class="help-ex-label">⬛ Letra que nao esta na palavra</p>
+                </div>
+                <p>As cores do teclado mostram o <strong>melhor resultado</strong> entre as duas palavras.</p>
+                <p>Uma nova dupla todo dia!</p>
+            </div>
+            <button class="btn btn-primary" id="btn-help-close">Entendi!</button>
+        </div>
+    </div>
+
+    <!-- Modal: nome do jogador -->
+    <div id="modal-name" class="modal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <div class="modal-icon">🟩🟩</div>
+            <h2 class="modal-title">Palavras BR <span class="duo-badge">DUO</span></h2>
+            <p class="modal-subtitle">Adivinhe as duas palavras do dia em ate 6 tentativas!</p>
+            <input type="text" id="player-name-input" class="input-field"
+                   placeholder="Seu nome..." maxlength="20" autocomplete="off">
+            <button class="btn btn-primary" id="btn-start">🎮 Jogar</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <script type="module" src="words/js/duo/main.js"></script>
+</body>
+</html>
