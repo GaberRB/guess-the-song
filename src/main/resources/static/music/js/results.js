@@ -84,8 +84,8 @@ export function shareResult() {
     document.getElementById('btn-share-close').onclick   = closeShareModal;
 
     const shareUrl = state.customQuizId
-        ? `${window.location.origin}/index.html?quiz=${state.customQuizId}`
-        : `${window.location.origin}`;
+        ? `https://music.quizminigames.com/?quiz=${state.customQuizId}`
+        : `https://music.quizminigames.com`;
 
     const viralText =
         `🎵 Acabei de jogar Guess The Song!\n\n` +

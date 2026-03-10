@@ -219,8 +219,8 @@ async function createQuiz() {
         });
         const data = await res.json();
 
-        const base      = window.location.origin;
-        const shareLink = `${base}/index.html?quiz=${data.quizId}`;
+        const base      = 'https://music.quizminigames.com';
+        const shareLink = `${base}/?quiz=${data.quizId}`;
         const adminLink = `${base}/criar?admin=${data.quizId}&token=${data.adminToken}`;
 
         document.getElementById('share-link').value = shareLink;
