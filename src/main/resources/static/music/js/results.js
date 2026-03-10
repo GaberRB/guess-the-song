@@ -84,7 +84,7 @@ export function shareResult() {
     document.getElementById('btn-share-close').onclick   = closeShareModal;
 
     const shareUrl = state.customQuizId
-        ? `${window.location.origin}/?quiz=${state.customQuizId}`
+        ? `${window.location.origin}/index.html?quiz=${state.customQuizId}`
         : `${window.location.origin}`;
 
     const viralText =
